@@ -39,7 +39,7 @@ class VKController extends Controller
         \DigitalStars\SimpleVK\Diagnostics::run();
     }
 
-    public function main()
+    public function controller()
     {
         try {
             $this->bot->setConfirm($this->confirm);
@@ -47,13 +47,26 @@ class VKController extends Controller
             /** Init Vars */
             $this->bot->initVars($peer_id, $user_id, $type, $message, $payload, $id, $attachments);
 
-            /** Модель пользователя, проверка на сущ-ние в БД  */
-            $userInfo = $this->bot->userInfo($peer_id);
-            $user = new User($userInfo);
+            /** Модель пользователя */
+            $user = new User($this->bot->userInfo($peer_id));
 
-            $this->bot->reply("End");
+            /** Обработка текстовых сообщений */
+            if ($type == "message_new") {
+                $messages = new Messages($this->bot, $user);
+                return $messages->messageController();
+            }
+
+            /** Обработка нажатий на кнопки */
+            if ($type == "message_event") {
+               $payload = new Payload($this->bot, $user, $payload);
+               return $payload->payloadController();
+            }
+
+
         } catch (Throwable $t) {
             LogLaravel::error($t->getMessage());
         }
+        return true;
     }
+
 }
