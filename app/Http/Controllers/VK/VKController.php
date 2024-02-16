@@ -4,16 +4,10 @@ namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
 
-//use App\Models\Log;
+
 use App\Models\User;
 
-use DigitalStars\SimpleVK\Auth;
-use DigitalStars\SimpleVK\Message;
-use DigitalStars\SimpleVK\SimpleVK;
-use DigitalStars\SimpleVK\LongPoll;
-use DigitalStars\SimpleVK\SimpleVkException;
-use DigitalStars\SimpleVK\Streaming;
-use DigitalStars\SimpleVK\Bot;
+use DigitalStars\SimpleVK\{Bot, Diagnostics, SimpleVK as vk};
 
 use Log as LogLaravel;
 use Throwable;
@@ -22,15 +16,17 @@ use Throwable;
 class VKController extends Controller
 {
     public string $confirm;
-    public SimpleVK $bot;
+    public vk $bot;
 
     public function __construct()
     {
         $token = config("app.VK_TOKEN");
         $this->confirm = config('app.VK_CONFIRM');
 
-        $this->bot = SimpleVK::create("$token", "5.120");
+        $this->bot = vk::create("$token", "5.120");
         $this->bot->setConfirm($this->confirm);
+
+
 
 
         $this->bot->setUserLogError("120637023");
@@ -38,7 +34,7 @@ class VKController extends Controller
     }
 
     public function diagnostics() {
-        \DigitalStars\SimpleVK\Diagnostics::run();
+        Diagnostics::run();
     }
 
     public function controller()
@@ -60,7 +56,7 @@ class VKController extends Controller
             /** Обработка нажатий на кнопки */
             if ($type == "message_event") {
                $payload = new Payload($this->bot, $user, $payload);
-               $this->bot->eventAnswerSnackbar(null);
+               $this->bot->eventAnswerSnackbar("Используйте навигацию для продолжения.");
                return $payload->payloadController();
             }
 
@@ -70,6 +66,7 @@ class VKController extends Controller
             LogLaravel::error($t->getMessage());
         }
 
+        return true;
     }
 
 }

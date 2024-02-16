@@ -4,6 +4,7 @@ namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
 
+use App\Models\Order;
 use App\Models\User;
 use DigitalStars\SimpleVK\SimpleVK;
 use DigitalStars\SimpleVK\SimpleVkException;
@@ -36,12 +37,16 @@ class Payload extends Controller
 
         try {
             if (isset($this->payload)) {
-                $this->bot->reply("Payload ...");
 
                 /** Если клик по категории */
                 if (isset($this->payload['is_category'])) {
                     $this->bot->reply("Debug: клик в категории");
                     return $this->payloadCategoryController();
+                }
+
+                if (isset($this->payload['is_subject'])) {
+                    $this->bot->reply("Debug: клик по предмету");
+                    return $this->payloadSubjectController();
                 }
 
                 /** События при клике в главном меню */
@@ -53,7 +58,7 @@ class Payload extends Controller
                 /** Возврат в главное меню */
                 if ($this->payload['data'] == "menu") {
                     $message = view("messages.start");
-                    return $this->bot->msg("$message")->kbd($this->button->mainMenu(), false, true)->send();
+                    return $this->bot->msg("$message")->kbd($this->button->mainMenu())->send();
                 }
             }
 
@@ -66,9 +71,21 @@ class Payload extends Controller
 
     }
 
+    /** Отслеживание нажатий кнопок в категории
+     * @throws SimpleVkException
+     */
     private function payloadCategoryController()
     {
-        $this->bot->reply("Спасибо за клик");
+        /**  */
+        $category_id = $this->payload['data'];
+
+        $message = "Выберите предмет";
+        $this->bot->msg("$message")->kbd($this->button->subjects($category_id) )->send();
+
+    }
+
+    private function payloadSubjectController() {
+        $this->bot->reply("Клик по предмету");
     }
 
     /** События в главном меню */
@@ -76,8 +93,10 @@ class Payload extends Controller
     {
         try {
             if ($this->payload['data'] == "new_order") {
+                $order = new Order();
+
                 $message = "New Order";
-                return $this->bot->msg("$message")->kbd($this->button->categories(), false, true)->send();
+                return $this->bot->msg("$message")->kbd($this->button->categories() )->send();
             }
         } catch (SimpleVkException $e) {
             Log::error($e->getMessage());

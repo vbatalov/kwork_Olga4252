@@ -4,6 +4,7 @@ namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Subject;
 
 class Buttons extends Controller
 {
@@ -74,13 +75,31 @@ class Buttons extends Controller
         foreach ($categories as $category) {
             $buttons[] = $this->vk->bot->buttonCallback($category->name, 'white', [
                 'is_category' => true,
-                'data' => "$category->name"
+                'data' => "$category->id"
             ]);
         }
 
         $buttons [] = $this->mainMenuButton();
         return array_chunk($buttons, 2);
     }
+
+    /** Меню предметов в категории */
+    public function subjects(int $id)
+    {
+        $items =  Subject::where("category_id", $id)->get()->all();
+        $buttons = [];
+
+        foreach ($items as $item) {
+            $buttons[] = $this->vk->bot->buttonCallback($item->name, 'white', [
+                'is_subject' => true,
+                'data' => "$item->id"
+            ]);
+        }
+
+        $buttons [] = $this->mainMenuButton();
+        return array_chunk($buttons, 2);
+    }
+
 
     /** Кнопка главное меню */
     private function mainMenuButton()

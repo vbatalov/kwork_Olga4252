@@ -32,7 +32,7 @@ class Messages extends Controller
 
             if ($cookie == null) {
                 $message = view("messages.start");
-                return $this->bot->msg("$message")->kbd($this->button->mainMenu(), false, true)->send();
+                return $this->bot->msg("$message")->kbd($this->button->mainMenu())->send();
             }
 
         } catch (SimpleVkException $e) {
