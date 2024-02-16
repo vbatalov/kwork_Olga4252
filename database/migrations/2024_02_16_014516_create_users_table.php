@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string("surname")->nullable();
             $table->string("role")->default("student");
             $table->integer("percent")->default("0");
+            $table->string("cookie")->nullable();
             $table->timestamps();
         });
     }
