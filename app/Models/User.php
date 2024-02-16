@@ -2,6 +2,9 @@
 
 namespace App\Models;
 
+
+use App\Http\Controllers\VK\VKController;
+
 use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
@@ -12,15 +15,20 @@ class User extends Model
         "surname",
         "role",
         "percent",
+        "cookie",
     ];
 
-
     public User $user;
+
     public string $peer_id;
     public array $userInfo;
 
+    public VKController $vk;
+
     public function __construct(array $userInfo = null)
     {
+        $this->vk = new VKController();
+
         if ($userInfo != null) {
             /** Информация о пользователя */
             $this->userInfo = $userInfo;
@@ -32,6 +40,14 @@ class User extends Model
 
     }
 
+    /** Начальное сообщение */
+    private function messageStart()
+    {
+        $message = view("messages.start")->render();
+        $this->vk->bot->buttonCallback("$message", 'white', ['action' => "menu"]);
+
+    }
+
     /**
      * Инициализирует пользователя
      * Создает, если нет в БД
@@ -39,7 +55,12 @@ class User extends Model
      */
     private function init(): void
     {
-        /** Инициализация пользователя или создание нового */
+        /** Если пользователь новый, отправляю приветственное сообщение */
+        if (!User::where("peer_id", $this->peer_id)->exists()) {
+            $this->messageStart();
+        }
+
+        /** Инициализация пользователя и/или создание нового */
         $this->user = User::updateOrCreate(
             [
                 "peer_id" => $this->peer_id,
@@ -53,5 +74,18 @@ class User extends Model
 
     }
 
+    /** Установить cookie (для отслеживания сообщения) */
+    public function setCookie(string $cookie): bool
+    {
+        return $this->user->update([
+            "cookie" => $cookie
+        ]);
+    }
+
+    /** Получить cookie */
+    public function getCookie()
+    {
+        return $this->user->cookie;
+    }
 
 }
