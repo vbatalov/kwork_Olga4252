@@ -35,7 +35,6 @@ class Payload extends Controller
     {
 
         try {
-
             if (isset($this->payload)) {
                 $this->bot->reply("Payload ...");
 
@@ -48,7 +47,13 @@ class Payload extends Controller
                 /** События при клике в главном меню */
                 if (isset($this->payload['is_mainMenu'])) {
                     $this->bot->reply("Debug: клик в главном меню");
-//                    return $this->payloadMenuController();
+                    return $this->payloadMenuController();
+                }
+
+                /** Возврат в главное меню */
+                if ($this->payload['data'] == "menu") {
+                    $message = view("messages.start");
+                    return $this->bot->msg("$message")->kbd($this->button->mainMenu(), false, true)->send();
                 }
             }
 
@@ -56,18 +61,14 @@ class Payload extends Controller
             Log::error($e->getMessage());
         }
 
-        try {
-            return $this->bot->msg("После клика на кнопку ничего не произошло")->send();
-        } catch (SimpleVkException $e) {
-            Log::error($e->getMessage());
-        }
 
-        return true;
+        return $this->bot->reply("После клика на кнопку ничего не произошло");
+
     }
 
     private function payloadCategoryController()
     {
-        return true;
+        $this->bot->reply("Спасибо за клик");
     }
 
     /** События в главном меню */
@@ -76,7 +77,7 @@ class Payload extends Controller
         try {
             if ($this->payload['data'] == "new_order") {
                 $message = "New Order";
-                return $this->bot->msg("$message")->kbd($this->button->categories(), false, false)->send();
+                return $this->bot->msg("$message")->kbd($this->button->categories(), false, true)->send();
             }
         } catch (SimpleVkException $e) {
             Log::error($e->getMessage());

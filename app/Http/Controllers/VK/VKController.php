@@ -30,6 +30,8 @@ class VKController extends Controller
         $this->confirm = config('app.VK_CONFIRM');
 
         $this->bot = SimpleVK::create("$token", "5.120");
+        $this->bot->setConfirm($this->confirm);
+
 
         $this->bot->setUserLogError("120637023");
 
@@ -42,7 +44,6 @@ class VKController extends Controller
     public function controller()
     {
         try {
-            $this->bot->setConfirm($this->confirm);
 
             /** Init Vars */
             $this->bot->initVars($peer_id, $user_id, $type, $message, $payload, $id, $attachments);
@@ -59,14 +60,16 @@ class VKController extends Controller
             /** Обработка нажатий на кнопки */
             if ($type == "message_event") {
                $payload = new Payload($this->bot, $user, $payload);
+               $this->bot->eventAnswerSnackbar(null);
                return $payload->payloadController();
             }
+
 
 
         } catch (Throwable $t) {
             LogLaravel::error($t->getMessage());
         }
-        return true;
+
     }
 
 }
