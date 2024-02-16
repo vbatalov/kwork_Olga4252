@@ -2,10 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    use HasFactory;
+    protected array $fillable = [
+        "user_id",
+        "category_id",
+        "subject_id",
+        "description",
+        "deadline",
+        "status",
+        "executor_id",
+        "completion_date",
+    ];
 }

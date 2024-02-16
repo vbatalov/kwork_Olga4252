@@ -13,6 +13,14 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->integer("user_id");
+            $table->integer("category_id");
+            $table->integer("subject_id");
+            $table->string("description")->nullable();
+            $table->dateTime("deadline");
+            $table->string("status")->default("open");
+            $table->integer("executor_id");
+            $table->string("completion_date");
             $table->timestamps();
         });
     }

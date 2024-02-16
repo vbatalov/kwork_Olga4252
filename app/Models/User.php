@@ -6,5 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-
+    protected array $fillable = [
+        "cid",
+        "name",
+        "surname",
+        "role",
+        "percent",
+    ];
 }
