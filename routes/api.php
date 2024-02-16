@@ -20,6 +20,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 Route::controller(VKController::class)->group(function () {
-    Route::post("vk_bot", "main");
+    Route::post("vk_bot", "controller");
     Route::get("diagnostics", "diagnostics");
 });
