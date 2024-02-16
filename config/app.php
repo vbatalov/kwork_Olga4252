@@ -5,6 +5,10 @@ use Illuminate\Support\ServiceProvider;
 
 return [
 
+    "VK_TOKEN" => env("VK_TOKEN"),
+    "VK_CONFIRM" => env("VK_CONFIRM"),
+
+
     /*
     |--------------------------------------------------------------------------
     | Application Name
