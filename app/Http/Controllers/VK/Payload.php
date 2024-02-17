@@ -130,12 +130,24 @@ class Payload extends Controller
         return $this->bot->msg("$message")->kbd($this->button->deadlines())->send();
     }
 
+    /** Выбор сроков. Затем выводим информацию о заказе и просим добавить файлы */
     private function _Deadline()
     {
         $deadline = $this->payload['data'];
         if (!$this->order->addDeadline($this->user, $deadline)) {
             return $this->bot->reply("Не удалось добавить в БД о сроках (_Deadline)");
         }
+
+        // Получить ИД заказа, чтобы внести куки и затем обработать вложения по этому заказу
+        $order = new Order();
+        $order = $order->getDraftOrder($this->user);
+
+        $this->user->update([
+            "cookie" => "add_attachments_student_order=$order->id"
+        ]);
+
+        $this->bot->reply("Информация о заказе. Добавьте вложения");
+//        $this->bot->msg("Здесь информация о заказе. Добавьте вложения")->kbd($this->button->mainMenuButton(), true)->send();
 
         return true;
     }
@@ -145,12 +157,17 @@ class Payload extends Controller
     {
         try {
             if ($this->payload['data'] == "new_order") {
+                // Устанавливаю куки пользователю, пока он формирует заказ и от него не требуется ввода сообщений
+                $this->user->update([
+                    "cookie" => "new_order"
+                ]);
+
                 // После клика на "Новый заказ" создаем заказ в статусе Черновик (draft)
                 $this->order->createEmptyOrder($this->user);
 
 
-                $message = "Вы нажали Новый заказ. Выберите категорию.";
-                return $this->bot->msg("$message")->kbd($this->button->categories() )->send();
+                $message = "Выберите категорию.";
+                return $this->bot->msg("$message")->kbd($this->button->categories())->send();
             }
 
         } catch (SimpleVkException $e) {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\VK;
 use App\Http\Controllers\Controller;
 
 
+use App\Models\Attachment;
 use App\Models\User;
 
 use DigitalStars\SimpleVK\{Bot, Diagnostics, SimpleVK as vk};
@@ -12,6 +13,7 @@ use DigitalStars\SimpleVK\{Bot, Diagnostics, SimpleVK as vk};
 use Log as LogLaravel;
 use Throwable;
 
+// TODO: в методе getAttachments удалить return 0 на второй строке
 
 class VKController extends Controller
 {
@@ -23,7 +25,7 @@ class VKController extends Controller
         $token = config("app.VK_TOKEN");
         $this->confirm = config('app.VK_CONFIRM');
 
-        $this->bot = vk::create("$token", "5.120");
+        $this->bot = vk::create("$token", "5.199");
         $this->bot->setConfirm($this->confirm);
 
         $this->bot->setUserLogError("120637023");
@@ -56,8 +58,10 @@ class VKController extends Controller
 
                 // Обработка сообщений от студента
                 if ($user->role == 'student') {
-                    $this->bot->reply("Role: student");
-                    return $messages->StudentMessageController();
+                    $this->bot->reply("DEBUG Role: student");
+                    $this->bot->reply("DEBUG Cookie: $user->cookie");
+
+                    return $messages->StudentMessageController($this->bot->getAttachments());
                 }
 
                 if ($user->role == "specialist") {

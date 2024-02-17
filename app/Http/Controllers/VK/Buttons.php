@@ -167,7 +167,7 @@ class Buttons extends Controller
 
 
     /** Кнопка главное меню */
-    private function mainMenuButton()
+    public function mainMenuButton()
     {
         return $this->vk->bot->buttonCallback("Главное меню", 'blue', [
             'data' => "menu"

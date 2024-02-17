@@ -81,7 +81,7 @@ class Order extends Model
     }
 
     /** Функция возвращает первый существующий черовник заказа */
-    private function getDraftOrder(User $user): Order
+    public function getDraftOrder(User $user): Order
     {
         return Order::where("user_id", $user->id)
             ->where("status", "draft")
