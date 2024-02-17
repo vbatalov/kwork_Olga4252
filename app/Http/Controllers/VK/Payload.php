@@ -22,42 +22,64 @@ class Payload extends Controller
 
     public Buttons $button;
 
+    public Order $order;
     public function __construct(SimpleVK $bot, User $user, $payload)
     {
         $this->bot = $bot;
         $this->user = $user;
         $this->payload = $payload;
 
+        $this->order = new Order();
+
         $this->button = new Buttons();
     }
 
     /** Контроллер всех нажатий на кнопку */
-    public function payloadController()
+    public function StudentPayloadController()
     {
 
         try {
             if (isset($this->payload)) {
 
-                /** Если клик по категории */
+                /**
+                 * Если клик по категории
+                 * Пользователь выбирает Категорию (например, математика) затем ему нужно выбрать предмет
+                 */
                 if (isset($this->payload['is_category'])) {
-                    $this->bot->reply("Debug: клик в категории");
-                    return $this->payloadCategoryController();
+                    $this->bot->eventAnswerSnackbar("Выберите предмет");
+                    return $this->_CategoryController();
                 }
 
+                // Клик по предмету, затем нужно выбрать с чем помочь
                 if (isset($this->payload['is_subject'])) {
-                    $this->bot->reply("Debug: клик по предмету");
-                    return $this->payloadSubjectController();
+                    $this->bot->eventAnswerSnackbar("Выберите с чем нужна помощь");
+                    return $this->_SubjectController();
+                }
+
+                // Клик с чем нужна помощь, затем выбор сроков
+                if (isset($this->payload['is_whatYouNeedHelpWith'])) {
+                    $this->bot->eventAnswerSnackbar("Укажите требуемые сроки");
+                    return $this->_WhatYouNeedHelpWith();
+                }
+
+                // Клик по срокам, затем ...
+                if (isset($this->payload['is_deadline'])) {
+                    $this->bot->eventAnswerSnackbar("Укажите...");
+                    return $this->_Deadline();
                 }
 
                 /** События при клике в главном меню */
                 if (isset($this->payload['is_mainMenu'])) {
                     $this->bot->reply("Debug: клик в главном меню");
-                    return $this->payloadMenuController();
+                    $this->bot->eventAnswerSnackbar("Вы сделали клик из главного меню");
+
+                    return $this->_MenuController();
                 }
 
                 /** Возврат в главное меню */
                 if ($this->payload['data'] == "menu") {
                     $message = view("messages.start");
+                    $this->bot->eventAnswerSnackbar("Главное меню");
                     return $this->bot->msg("$message")->kbd($this->button->mainMenu())->send();
                 }
             }
@@ -74,30 +96,63 @@ class Payload extends Controller
     /** Отслеживание нажатий кнопок в категории
      * @throws SimpleVkException
      */
-    private function payloadCategoryController()
+    private function _CategoryController()
     {
-        /**  */
+        /** Идентифицирую ID категории */
         $category_id = $this->payload['data'];
+        /** Добавляю категорию в заказ */
+        if (!$this->order->addCategory($this->user, $category_id)) {
+            $this->bot->reply("Не удалось добавить категорию в заказ (ошибка БД).");
+        }
 
         $message = "Выберите предмет";
-        $this->bot->msg("$message")->kbd($this->button->subjects($category_id) )->send();
-
+        return $this->bot->msg("$message")->kbd($this->button->subjects($category_id) )->send();
     }
 
-    private function payloadSubjectController() {
-        $this->bot->reply("Клик по предмету");
+    /**  Клик по теме, отправка клавиатуры для выбора "С чем нужна помощь" */
+    private function _SubjectController() {
+        $subject_id = $this->payload['data'];
+        $this->order->addSubject($this->user, $subject_id);
+
+        $message = "Выберите с чем нужна помощь";
+        return $this->bot->msg("$message")->kbd($this->button->whatYouNeedHelpWith())->send();
+    }
+
+    /** Клик "С чем нужна помощь". Отправка клавиатуры со сроками */
+    private function _WhatYouNeedHelpWith()
+    {
+        $need_help_with = $this->payload['data'];
+        if (!$this->order->addWhatYouNeedHelpWith($this->user, $need_help_with)) {
+            return $this->bot->reply("Не удалось добавить в БД информацию об объекте помощи (_WhatYouNeedHelpWith)");
+        }
+
+        $message = "Укажите требуемые сроки";
+        return $this->bot->msg("$message")->kbd($this->button->deadlines())->send();
+    }
+
+    private function _Deadline()
+    {
+        $deadline = $this->payload['data'];
+        if (!$this->order->addDeadline($this->user, $deadline)) {
+            return $this->bot->reply("Не удалось добавить в БД о сроках (_Deadline)");
+        }
+
+        return true;
     }
 
     /** События в главном меню */
-    private function payloadMenuController()
+    private function _MenuController()
     {
         try {
             if ($this->payload['data'] == "new_order") {
-                $order = new Order();
+                // После клика на "Новый заказ" создаем заказ в статусе Черновик (draft)
+                $this->order->createEmptyOrder($this->user);
 
-                $message = "New Order";
+
+                $message = "Вы нажали Новый заказ. Выберите категорию.";
                 return $this->bot->msg("$message")->kbd($this->button->categories() )->send();
             }
+
         } catch (SimpleVkException $e) {
             Log::error($e->getMessage());
         }

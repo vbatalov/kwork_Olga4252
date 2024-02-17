@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Subject extends Model
 {
-    protected array $fillable = [
+    protected $fillable = [
         "category_id",
         "name",
         "description",

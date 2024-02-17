@@ -3,13 +3,14 @@
 namespace App\Models;
 
 
+use App\Http\Controllers\VK\Buttons;
 use App\Http\Controllers\VK\VKController;
 
 use Illuminate\Database\Eloquent\Model;
 
 class User extends Model
 {
-    protected array $fillable = [
+    protected $fillable = [
         "peer_id",
         "name",
         "surname",
@@ -25,59 +26,52 @@ class User extends Model
 
     public VKController $vk;
 
-    public function __construct(array $userInfo = null)
+    public function __construct()
     {
         $this->vk = new VKController();
-
-        if ($userInfo != null) {
-            /** Информация о пользователя */
-            $this->userInfo = $userInfo;
-
-            /** Инициализация пользователя */
-            $this->peer_id = $userInfo['id'];
-            $this->init();
-        }
-
     }
 
     /** Начальное сообщение */
-    private function messageStart()
+    private function messageStart(): void
     {
+        $button = new Buttons();
         $message = view("messages.start")->render();
-        $this->vk->bot->buttonCallback("$message", 'white', ['action' => "menu"]);
-
+        $this->vk->bot->msg("$message")->kbd($button->mainMenu())->send();
     }
 
     /**
      * Инициализирует пользователя
      * Создает, если нет в БД
      * Обновляет данные
+     * @throws \Throwable
      */
-    private function init(): void
+    public function init($user_info): User
     {
         /** Если пользователь новый, отправляю приветственное сообщение */
-        if (!User::where("peer_id", $this->peer_id)->exists()) {
+        if (!User::where("peer_id", $user_info['id'])->exists()) {
             $this->messageStart();
         }
 
         /** Инициализация пользователя и/или создание нового */
-        $this->user = User::updateOrCreate(
+
+        $user = User::updateOrCreate(
             [
-                "peer_id" => $this->peer_id,
+                "peer_id" => $user_info['id'],
             ],
             [
-                "name" => $this->userInfo['first_name'],
-                "surname" => $this->userInfo['last_name'],
+                "name" => $user_info['first_name'],
+                "surname" => $user_info['last_name'],
             ]
         );
 
-
+        $this->user = $user;
+        return $user;
     }
 
     /** Установить cookie (для отслеживания сообщения) */
-    public function setCookie(string $cookie): bool
+    public function setCookie(User $user, string $cookie): bool
     {
-        return $this->user->update([
+        return $user->update([
             "cookie" => $cookie
         ]);
     }

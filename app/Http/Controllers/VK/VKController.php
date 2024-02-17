@@ -26,14 +26,11 @@ class VKController extends Controller
         $this->bot = vk::create("$token", "5.120");
         $this->bot->setConfirm($this->confirm);
 
-
-
-
         $this->bot->setUserLogError("120637023");
-
     }
 
-    public function diagnostics() {
+    public function diagnostics()
+    {
         Diagnostics::run();
     }
 
@@ -45,25 +42,44 @@ class VKController extends Controller
             $this->bot->initVars($peer_id, $user_id, $type, $message, $payload, $id, $attachments);
 
             /** Модель пользователя */
-            $user = new User($this->bot->userInfo($peer_id));
+            $user = new User();
+            $user = $user->init($this->bot->userInfo($peer_id));
+            if ($user->count() < 1) {
+                $this->bot->reply("DEBUG: User not identify");
+            } else {
+                $this->bot->reply("DEBUG: User identify");
+            }
 
             /** Обработка текстовых сообщений */
             if ($type == "message_new") {
-                $messages = new Messages($this->bot, $user);
-                return $messages->messageController();
+                $messages = new Messages($this->bot, $user); // init
+
+                // Обработка сообщений от студента
+                if ($user->role == 'student') {
+                    $this->bot->reply("Role: student");
+                    return $messages->StudentMessageController();
+                }
+
+                if ($user->role == "specialist") {
+                    $this->bot->reply("Обработка сообщений специалиста не настроена");
+                }
             }
 
             /** Обработка нажатий на кнопки */
             if ($type == "message_event") {
-               $payload = new Payload($this->bot, $user, $payload);
-               $this->bot->eventAnswerSnackbar("Используйте навигацию для продолжения.");
-               return $payload->payloadController();
-            }
+                $payload = new Payload($this->bot, $user, $payload); // init
 
+                // Обработка нажатий на кнопки студента
+                if ($user->role == 'student') {
+                     $payload->StudentPayloadController();
+                }
+            }
 
 
         } catch (Throwable $t) {
             LogLaravel::error($t->getMessage());
+            LogLaravel::error($t->getFile());
+            LogLaravel::error($t->getLine());
         }
 
         return true;

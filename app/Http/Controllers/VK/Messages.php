@@ -24,11 +24,11 @@ class Messages extends Controller
     }
 
 
-    public function messageController()
+    public function StudentMessageController()
     {
         try {
             /** Cookie */
-            $cookie = $this->user->getCookie();
+            $cookie = $this->user->cookie;
 
             if ($cookie == null) {
                 $message = view("messages.start");
