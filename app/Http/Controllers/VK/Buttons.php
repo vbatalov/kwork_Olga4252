@@ -5,6 +5,8 @@ namespace App\Http\Controllers\VK;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Subject;
+use Carbon\Carbon;
+use Carbon\Traits\Date;
 
 class Buttons extends Controller
 {
@@ -86,13 +88,76 @@ class Buttons extends Controller
     /** Меню предметов в категории */
     public function subjects(int $id)
     {
-        $items =  Subject::where("category_id", $id)->get()->all();
+        $items = Subject::where("category_id", $id)->get()->all();
         $buttons = [];
 
         foreach ($items as $item) {
-            $buttons[] = $this->vk->bot->buttonCallback($item->name, 'white', [
+            $name_filter = mb_strimwidth($item->name, 0, 40);
+            $buttons[] = $this->vk->bot->buttonCallback($name_filter, 'white', [
                 'is_subject' => true,
                 'data' => "$item->id"
+            ]);
+        }
+
+        $buttons [] = $this->mainMenuButton();
+        return array_chunk($buttons, 2);
+    }
+
+    /** Меню выбора: с чем нужно помочь */
+    public function whatYouNeedHelpWith()
+    {
+        $items = [
+            "Онлайн работа",
+            "Курсовая",
+            "Реферат / лит. обзор",
+            "Репетиторство",
+            "Диплом",
+            "Другое",
+        ];
+        $buttons = [];
+
+        foreach ($items as $item) {
+            $buttons[] = $this->vk->bot->buttonCallback($item, 'white', [
+                'is_whatYouNeedHelpWith' => true,
+                'data' => $item,
+            ]);
+        }
+
+        $buttons [] = $this->mainMenuButton();
+        return array_chunk($buttons, 2);
+    }
+
+    /** Кнопка: сроки */
+    public function deadlines()
+    {
+        $items = [
+            [
+                "title" => "Срочно",
+                "data" => Carbon::now(),
+            ],
+            [
+                "title" => "1 день",
+                "data" => Carbon::now()->add("1 day"),
+            ],
+            [
+                "title" => "2-3 дня",
+                "data" => Carbon::now()->add("3 day"),
+            ],
+            [
+                "title" => "4-7 дней",
+                "data" => Carbon::now()->add("7 day"),
+            ],
+            [
+                "title" => "Более недели",
+                "data" => "Более недели",
+            ],
+        ];
+        $buttons = [];
+
+        foreach ($items as $item) {
+            $buttons[] = $this->vk->bot->buttonCallback($item['title'], 'white', [
+                'is_deadline' => true,
+                'data' => $item['data'],
             ]);
         }
 
