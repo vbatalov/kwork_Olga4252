@@ -46,7 +46,7 @@ class VKController extends Controller
             $user = new User();
             $user = $user->init($this->bot->userInfo($peer_id));
             if ($user->count() < 1) {
-                $this->bot->reply("ERROR: User not identify");
+                return $this->bot->reply("ERROR: User not identify");
             }
 
             /** Обработка нажатий на кнопки */
