@@ -64,8 +64,14 @@ class Payload extends Controller
 
                 // Клик по срокам, затем ...
                 if (isset($this->payload['is_deadline'])) {
-                    $this->bot->eventAnswerSnackbar("Укажите...");
+                    $this->bot->eventAnswerSnackbar("При необходимости добавьте вложения и/или отправьте заказ");
                     return $this->_Deadline();
+                }
+
+                // Клик отправить заявку
+                if (isset($this->payload['publish_order'])) {
+                    $this->bot->eventAnswerSnackbar("Заявка опубликована");
+                    return $this->_publishOrder();
                 }
 
                 /** События при клике в главном меню */
@@ -130,7 +136,9 @@ class Payload extends Controller
         return $this->bot->msg("$message")->kbd($this->button->deadlines())->send();
     }
 
-    /** Выбор сроков. Затем выводим информацию о заказе и просим добавить файлы */
+    /** Выбор сроков. Затем выводим информацию о заказе и просим добавить файлы
+     * @throws Throwable
+     */
     private function _Deadline()
     {
         $deadline = $this->payload['data'];
@@ -146,10 +154,21 @@ class Payload extends Controller
             "cookie" => "add_attachments_student_order=$order->id"
         ]);
 
-        $this->bot->reply("Информация о заказе. Добавьте вложения");
-//        $this->bot->msg("Здесь информация о заказе. Добавьте вложения")->kbd($this->button->mainMenuButton(), true)->send();
+        // Информация о заказе
+        $order_info = $order->getInfoByOrderId($order->id);
+        return $this->bot->msg("$order_info")->kbd($this->button->publishOrder())->send();
+    }
 
-        return true;
+    /** Отправка заявки
+     * @throws SimpleVkException
+     */
+    private function _publishOrder()
+    {
+        // Публикация заказа
+        if (!$this->order->publishOrder($this->user)) {
+            return $this->bot->reply("При публикации заявки произошла ошибка");
+        }
+        return $this->bot->msg("Ваша заявка опубликована, ожидайте ответа помощников.")->kbd($this->button->mainMenuButton())->send();
     }
 
     /** События в главном меню */

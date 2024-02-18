@@ -4,6 +4,7 @@ namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Subject;
 use Carbon\Carbon;
 use Carbon\Traits\Date;
@@ -133,7 +134,7 @@ class Buttons extends Controller
         $items = [
             [
                 "title" => "Срочно",
-                "data" => Carbon::now(),
+                "data" => "Срочно",
             ],
             [
                 "title" => "1 день",
@@ -160,6 +161,18 @@ class Buttons extends Controller
                 'data' => $item['data'],
             ]);
         }
+
+        $buttons [] = $this->mainMenuButton();
+        return array_chunk($buttons, 2);
+    }
+
+    /** Опубликовать заявку */
+    public function publishOrder()
+    {
+        $buttons[] = $this->vk->bot->buttonCallback("Опубликовать заказ", 'white', [
+            'publish_order' => true,
+            'data' => "publish_order",
+        ]);
 
         $buttons [] = $this->mainMenuButton();
         return array_chunk($buttons, 2);
