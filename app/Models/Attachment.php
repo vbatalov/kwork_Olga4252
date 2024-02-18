@@ -10,6 +10,7 @@ class Attachment extends Model
         "user_id",
         "order_id",
         "attachments",
+        "type"
     ];
 
     protected $casts = [
@@ -17,43 +18,18 @@ class Attachment extends Model
     ];
 
     /** Добавить вложения к ID заказу */
-    public function addAttachmentToOrderId(User $user, $order_id, $attachments)
+    public function addAttachmentToOrderId(User $user, $order_id, $attachments): void
     {
-
-
-        if (Attachment::where(["user_id" => $user->id, "order_id" => $order_id,])->exists()) {
-
-            \Log::alert("Вложения уже в БД есть");
-
-            // Предыдущие вложения
-            $current_attachments = Attachment::where([
-                "user_id" => $user->id,
-                "order_id" => $order_id,
-            ])->first();
-
-            // Добавляю новое вложение
-            $newAttachments = [
-                $current_attachments->attachments,
-                $attachments
-            ];
-            // Обновляю БД
-            $current_attachments::update([
-                "user_id" => $user->id,
-                "order_id" => $order_id,
-                "attachments" => ["sdf"],
-            ]);
-        } else {
-            \Log::alert("Вложений нет");
-            // Если вложений ещё нет, добавляю первое
-            Attachment::create([
-                "user_id" => $user->id,
-                "order_id" => $order_id,
-                "attachments" => $attachments,
-            ]);
+        foreach ($attachments as $type => $attachment) {
+            foreach ($attachment as $item) {
+                Attachment::create([
+                    "user_id" => $user->id,
+                    "order_id" => $order_id,
+                    "type" => $type,
+                    "attachments" => $item,
+                ]);
+            }
         }
 
-        $result = Attachment::where(["user_id" => $user->id, "order_id" => $order_id,])->first();
-
-        return \Log::alert(count($result->attachments));
     }
 }

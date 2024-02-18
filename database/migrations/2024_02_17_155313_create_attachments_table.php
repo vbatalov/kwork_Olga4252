@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->integer("user_id");
             $table->integer("order_id");
+            $table->string("type");
             $table->json("attachments");
             $table->timestamps();
         });
