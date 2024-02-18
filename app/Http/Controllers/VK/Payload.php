@@ -23,6 +23,7 @@ class Payload extends Controller
     public Buttons $button;
 
     public Order $order;
+
     public function __construct(SimpleVK $bot, User $user, $payload)
     {
         $this->bot = $bot;
@@ -76,15 +77,17 @@ class Payload extends Controller
 
                 /** События при клике в главном меню */
                 if (isset($this->payload['is_mainMenu'])) {
-                    $this->bot->reply("Debug: клик в главном меню");
-                    $this->bot->eventAnswerSnackbar("Вы сделали клик из главного меню");
-
+//                    $this->bot->reply("Debug: клик в главном меню");
                     return $this->_MenuController();
                 }
 
                 /** Возврат в главное меню */
                 if ($this->payload['data'] == "menu") {
                     $message = view("messages.start");
+                    $this->user->update([
+                        "cookie" => null
+                    ]);
+
                     $this->bot->eventAnswerSnackbar("Главное меню");
                     return $this->bot->msg("$message")->kbd($this->button->mainMenu())->send();
                 }
@@ -112,11 +115,12 @@ class Payload extends Controller
         }
 
         $message = "Выберите предмет";
-        return $this->bot->msg("$message")->kbd($this->button->subjects($category_id) )->send();
+        return $this->bot->msg("$message")->kbd($this->button->subjects($category_id))->send();
     }
 
     /**  Клик по теме, отправка клавиатуры для выбора "С чем нужна помощь" */
-    private function _SubjectController() {
+    private function _SubjectController()
+    {
         $subject_id = $this->payload['data'];
         $this->order->addSubject($this->user, $subject_id);
 
@@ -184,8 +188,9 @@ class Payload extends Controller
                 // После клика на "Новый заказ" создаем заказ в статусе Черновик (draft)
                 $this->order->createEmptyOrder($this->user);
 
+                $this->bot->eventAnswerSnackbar("Выберите категорию");
 
-                $message = "Выберите категорию.";
+                $message = "Выберите направление заявки";
                 return $this->bot->msg("$message")->kbd($this->button->categories())->send();
             }
 

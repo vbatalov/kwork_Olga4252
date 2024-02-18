@@ -50,13 +50,14 @@ class Messages extends Controller
             // Если пользователь отправляет вложения к определнному заказу
             // add_attachments_student_$idOrder
             if ($order_id = str_replace("add_attachments_student_order=", "", $cookie)) {
-                $this->bot->reply("DEBUG: Order: $order_id");
+//                $this->bot->reply("DEBUG: Order: $order_id");
 
                 // Проверяю, отправил ли пользователь вложение
                 if (!empty($attachments)) {
                     $this->attachments->addAttachmentToOrderId($this->user, $order_id, $attachments);
+                    return $this->bot->msg("Мы добавили вложение в заказ. При необходимости, можете добавить ещё вложения или отправьте заявку.")->kbd($this->button->publishOrder())->send();
                 } else {
-                    $this->bot->reply("Вы отправили текстовое сообщение, необходимо добавить вложения.");
+                    return $this->bot->reply("Вы отправили текстовое сообщение, необходимо добавить вложения или отправить заявку без вложений.");
                 }
             }
 
