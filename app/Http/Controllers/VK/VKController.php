@@ -5,7 +5,6 @@ namespace App\Http\Controllers\VK;
 use App\Http\Controllers\Controller;
 
 
-use App\Models\Attachment;
 use App\Models\User;
 
 use DigitalStars\SimpleVK\{Bot, Diagnostics, SimpleVK as vk};
@@ -52,6 +51,16 @@ class VKController extends Controller
 //                $this->bot->reply("DEBUG: User identify");
             }
 
+            /** Обработка нажатий на кнопки */
+            if ($type == "message_event" or (isset($payload))) {
+                $payload = new Payload($this->bot, $user, $payload); // init
+
+                // Обработка нажатий на кнопки студента
+                if ($user->role == 'student') {
+                    return $payload->StudentPayloadController();
+                }
+            }
+
             /** Обработка текстовых сообщений */
             if ($type == "message_new") {
                 $messages = new Messages($this->bot, $user); // init
@@ -66,16 +75,6 @@ class VKController extends Controller
 
                 if ($user->role == "specialist") {
                     $this->bot->reply("Обработка сообщений специалиста не настроена");
-                }
-            }
-
-            /** Обработка нажатий на кнопки */
-            if ($type == "message_event") {
-                $payload = new Payload($this->bot, $user, $payload); // init
-
-                // Обработка нажатий на кнопки студента
-                if ($user->role == 'student') {
-                     $payload->StudentPayloadController();
                 }
             }
 

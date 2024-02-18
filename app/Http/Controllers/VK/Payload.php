@@ -194,6 +194,8 @@ class Payload extends Controller
                 return $this->bot->msg("$message")->kbd($this->button->categories())->send();
             }
 
+            return $this->bot->eventAnswerSnackbar("После нажатия на кнопку ничего не произошло (_MenuController)");
+
         } catch (SimpleVkException $e) {
             Log::error($e->getMessage());
         }
