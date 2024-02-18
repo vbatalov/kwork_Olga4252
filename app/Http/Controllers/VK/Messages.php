@@ -4,6 +4,7 @@ namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attachment;
+use App\Models\Order;
 use App\Models\User;
 use DigitalStars\SimpleVK\SimpleVK;
 use DigitalStars\SimpleVK\SimpleVkException;
@@ -29,7 +30,7 @@ class Messages extends Controller
     }
 
 
-    public function StudentMessageController($attachments)
+    public function StudentMessageController($attachments, $text)
     {
         try {
             /** Cookie */
@@ -57,7 +58,12 @@ class Messages extends Controller
                     $this->attachments->addAttachmentToOrderId($this->user, $order_id, $attachments);
                     return $this->bot->msg("Мы добавили вложение в заказ. При необходимости, можете добавить ещё вложения или отправьте заявку.")->kbd($this->button->publishOrder())->send();
                 } else {
-                    return $this->bot->reply("Вы отправили текстовое сообщение, необходимо добавить вложения или отправить заявку без вложений.");
+                    $order = Order::findOrFail($order_id);
+                    $order->update([
+                        "description" => $text
+                    ]);
+                    $message = view("messages.order_info", compact("order"))->render();
+                    return $this->bot->reply("$message");
                 }
             }
 

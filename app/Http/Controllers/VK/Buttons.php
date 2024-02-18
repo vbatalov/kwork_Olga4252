@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Subject;
+use App\Models\User;
 use Carbon\Carbon;
 use Carbon\Traits\Date;
 
@@ -25,31 +26,24 @@ class Buttons extends Controller
             [
                 "text" => "Новый заказ",
                 "color" => "white",
-
-                "is_mainMenu" => true,
                 "data" => "new_order",
 
             ],
             [
                 "text" => "Мои заказы",
                 "color" => "white",
-
-                "is_mainMenu" => true,
                 "data" => "my_orders",
 
             ],
             [
                 "text" => "Избранные специалисты",
                 "color" => "white",
-
-                "is_mainMenu" => true,
                 "data" => "my_favorites_specialists",
 
             ],
             [
                 "text" => "Настроить личный кабинет",
                 "color" => "white",
-                "is_mainMenu" => true,
                 "data" => "user_profile_setting",
 
             ],
@@ -60,7 +54,7 @@ class Buttons extends Controller
         foreach ($items as $item) {
             $buttons [] = [
                 $this->vk->bot->buttonCallback($item['text'], $item['color'], [
-                    "is_mainMenu" => $item['is_mainMenu'],
+                    "action" => "click_from_main_menu",
                     "data" => $item['data'],
                 ])
             ];
@@ -77,13 +71,14 @@ class Buttons extends Controller
 
         foreach ($categories as $category) {
             $buttons[] = $this->vk->bot->buttonCallback($category->name, 'white', [
-                'is_category' => true,
+                "action" => "click_from_category",
                 'data' => "$category->id"
             ]);
         }
 
-        $buttons [] = $this->mainMenuButton();
-        return array_chunk($buttons, 2);
+        $chunk = array_chunk($buttons, 2);
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
     }
 
     /** Меню предметов в категории */
@@ -95,13 +90,14 @@ class Buttons extends Controller
         foreach ($items as $item) {
             $name_filter = mb_strimwidth($item->name, 0, 40);
             $buttons[] = $this->vk->bot->buttonCallback($name_filter, 'white', [
-                'is_subject' => true,
+                'action' => "click_from_subject",
                 'data' => "$item->id"
             ]);
         }
 
-        $buttons [] = $this->mainMenuButton();
-        return array_chunk($buttons, 2);
+        $chunk = array_chunk($buttons, 2);
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
     }
 
     /** Меню выбора: с чем нужно помочь */
@@ -119,13 +115,15 @@ class Buttons extends Controller
 
         foreach ($items as $item) {
             $buttons[] = $this->vk->bot->buttonCallback($item, 'white', [
-                'is_whatYouNeedHelpWith' => true,
+                'action' => "click_from_is_whatYouNeedHelpWith",
                 'data' => $item,
             ]);
         }
 
-        $buttons [] = $this->mainMenuButton();
-        return array_chunk($buttons, 2);
+
+        $chunk = array_chunk($buttons, 2);
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
     }
 
     /** Кнопка: сроки */
@@ -157,33 +155,103 @@ class Buttons extends Controller
 
         foreach ($items as $item) {
             $buttons[] = $this->vk->bot->buttonCallback($item['title'], 'white', [
-                'is_deadline' => true,
+                'action' => "click_from_deadline",
                 'data' => $item['data'],
             ]);
         }
 
-        $buttons [] = $this->mainMenuButton();
-        return array_chunk($buttons, 2);
+        $chunk = array_chunk($buttons, 2);
+        $chunk [] = [$this->goBack("click_from_subject")];
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
     }
 
     /** Опубликовать заявку */
     public function publishOrder()
     {
         $buttons[] = $this->vk->bot->buttonCallback("Опубликовать заказ", 'white', [
-            'publish_order' => true,
+            'action' => "publish_order",
             'data' => "publish_order",
         ]);
 
-        $buttons [] = $this->mainMenuButton();
-        return array_chunk($buttons, 2);
+        $chunk = array_chunk($buttons, 2);
+        $chunk [] = [$this->goBack("click_from_is_whatYouNeedHelpWith")];
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
+    /** Просмотр заказов пользователя */
+    public function getOrdersByUser(User $user)
+    {
+        $orders = Order::where("user_id", $user->id)->get()->all();
+        $buttons = [];
+        foreach ($orders as $order) {
+            $category_name = $order->category->name; // Наименование категории заказа
+
+            $buttons[] = $this->vk->bot->buttonCallback("Заказ № $order->id ($category_name)", 'white', [
+                'action' => "view_order",
+                'data' => "$order->id",
+            ]);
+        }
+
+        $chunk = array_chunk($buttons, 2);
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
+    /** Действия с заказом */
+    public function orderActions(Order $order)
+    {
+
+        $items =
+            [
+//                [
+//                    "text" => 'Редактировать заказ',
+//                    "action" => 'edit_order',
+//                    "color" => "white",
+//                    "data" => $order->id,
+//                ],
+                [
+                    "text" => 'Удалить заказ',
+                    "color" => "red",
+                    "action" => 'delete_order',
+                    "data" => $order->id,
+                ],
+            ];
+
+        $buttons = [];
+        foreach ($items as $item) {
+            $buttons[] = $this->vk->bot->buttonCallback($item['text'], $item['color'], [
+                'action' => $item['action'],
+                'data' => $item['data'],
+            ]);
+        }
+
+        $chunk = array_chunk($buttons, 1);
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
+    public function sendPayment(User $user)
+    {
+        return $this->vk->bot->buttonDonateToGroup("-224716757", [
+            "user" => $user->id,
+        ]);
     }
 
 
+    public function goBack($action, $text = "Назад")
+    {
+        return $this->vk->bot->buttonCallback("$text", 'white', [
+            'action' => "$action"
+        ]);
+    }
     /** Кнопка главное меню */
     public function mainMenuButton()
     {
         return $this->vk->bot->buttonCallback("Главное меню", 'blue', [
-            'data' => "menu"
+            'data' => "menu",
+            'action' => "return_to_home"
         ]);
     }
 }

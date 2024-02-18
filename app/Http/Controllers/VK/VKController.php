@@ -47,8 +47,6 @@ class VKController extends Controller
             $user = $user->init($this->bot->userInfo($peer_id));
             if ($user->count() < 1) {
                 $this->bot->reply("ERROR: User not identify");
-            } else {
-//                $this->bot->reply("DEBUG: User identify");
             }
 
             /** Обработка нажатий на кнопки */
@@ -70,7 +68,7 @@ class VKController extends Controller
 //                    $this->bot->reply("DEBUG Role: student");
 //                    $this->bot->reply("DEBUG Cookie: $user->cookie");
 
-                    return $messages->StudentMessageController($this->bot->getAttachments());
+                    return $messages->StudentMessageController($this->bot->getAttachments(), $message);
                 }
 
                 if ($user->role == "specialist") {

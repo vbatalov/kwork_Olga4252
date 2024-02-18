@@ -17,7 +17,7 @@ return new class extends Migration
             $table->integer("category_id")->nullable();
             $table->integer("subject_id")->nullable();
             $table->longText("need_help_with")->nullable();
-            $table->dateTime("description")->nullable();
+            $table->longText("description")->nullable();
             $table->string("deadline")->nullable();
             $table->string("status")->default("draft");
             $table->integer("executor_id")->nullable();
