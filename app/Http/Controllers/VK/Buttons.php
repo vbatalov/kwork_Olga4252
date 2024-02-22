@@ -36,13 +36,13 @@ class Buttons extends Controller
             ],
             [
                 "text" => "Избранные специалисты",
-                "color" => "white",
+                "color" => "blue",
                 "data" => "my_favorites_specialists",
 
             ],
             [
                 "text" => "Настроить личный кабинет",
-                "color" => "white",
+                "color" => "blue",
                 "data" => "user_profile_setting",
 
             ],
@@ -70,7 +70,7 @@ class Buttons extends Controller
 
         foreach ($categories as $category) {
             $buttons[] = $this->vk->bot->buttonCallback($category->name, 'blue', [
-                "action" => "click_from_category",
+                "action" => "newOrderSaveCategoryAndShowSubject",
                 'data' => "$category->id"
             ]);
         }
@@ -89,7 +89,7 @@ class Buttons extends Controller
         foreach ($items as $item) {
             $name_filter = mb_strimwidth($item->name, 0, 40);
             $buttons[] = $this->vk->bot->buttonCallback($name_filter, 'blue', [
-                'action' => "click_from_subject",
+                'action' => "newOrderSaveSubjectAndShowWhatYouNeedHelpWith",
                 'data' => "$item->id"
             ]);
         }
@@ -114,7 +114,7 @@ class Buttons extends Controller
 
         foreach ($items as $item) {
             $buttons[] = $this->vk->bot->buttonCallback($item, 'blue', [
-                'action' => "click_from_is_whatYouNeedHelpWith",
+                'action' => "newOrderSaveWhatYouNeedHelpWithAndShowDeadlines",
                 'data' => $item,
             ]);
         }

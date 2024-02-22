@@ -42,13 +42,12 @@ class Payload extends Controller
             if (isset($this->payload) and (isset($this->payload['action']))) {
 
                 $action = $this->payload['action'];
+
+                // Контроллер заказов
+                // Создание, просмотр, удаление, оплата
                 $orderController = new OrderController($this->bot, $this->user, $this->payload);
                 $orderController->init();
 
-                /** События при клике в главном меню */
-                if ($this->payload['action'] == "click_from_main_menu") {
-                    return $this->_MenuController();
-                }
 
                 /**
                  * Если клик по категории
@@ -189,43 +188,4 @@ class Payload extends Controller
         return $this->bot->msg("Ваша заявка опубликована, ожидайте ответа помощников.")->kbd($this->button->mainMenuButton())->send();
     }
 
-    /** События в главном меню (Новый заказ, просмотр заказов) */
-    private function _MenuController()
-    {
-        // Переменная используется для понимания, на какую конкретно кнопку нажал пользователь
-        $data = $this->payload['data'];
-
-        try {
-            // Если нажат Новый заказ
-            if ($data == "new_order") {
-                // Устанавливаю куки пользователю, пока он формирует заказ и от него не требуется ввода сообщений
-                $this->user->update([
-                    "cookie" => "new_order"
-                ]);
-
-                // После клика на "Новый заказ" создаем заказ в статусе Черновик (draft)
-                $this->order->createEmptyOrder($this->user);
-
-                $message = "Выберите направление заявки";
-                $this->bot->eventAnswerSnackbar("$message");
-                return $this->bot->msg("$message")->kbd($this->button->categories())->send();
-            }
-
-            if ($data == "my_orders") {
-                $message = "Выберите заказ";
-                $this->bot->eventAnswerSnackbar("$message");
-                return $this->bot->msg("$message")->kbd($this->button->getOrdersByUser($this->user))->send();
-            }
-
-
-
-
-            $this->bot->eventAnswerSnackbar("После нажатия на кнопку ничего не произошло (_MenuController)");
-
-        } catch (SimpleVkException $e) {
-            Log::error($e->getMessage());
-        }
-
-        return true;
-    }
 }
