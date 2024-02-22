@@ -113,18 +113,19 @@ class OrderController extends Controller
     // Сохранить сроки, показать информацию о заказе, назначить куки для обработки текстовых сообщений
     private function newOrderSaveDeadlineAndAddAttachmentsAndNotes(): void
     {
+        // save deadlines
         $deadline = $this->data;
         $this->order->addDeadline($this->user, $deadline);
 
         // Получить ИД заказа, чтобы внести куки и затем обработать вложения по этому заказу
         $order = new Order();
         $order = $order->getDraftOrder($this->user);
-
+        // обновить куки
         $this->user->update([
             "cookie" => "add_attachments_student_order=$order->id"
         ]);
 
-        // Информация о заказе
+        // Вывести информацию о заказе
         $order_info = $order->getInfoByOrderId($order->id);
         $this->bot->msg("$order_info")->kbd($this->button->publishOrder())->send();
     }
