@@ -154,7 +154,7 @@ class Buttons extends Controller
 
         foreach ($items as $item) {
             $buttons[] = $this->vk->bot->buttonCallback($item['title'], 'blue', [
-                'action' => "click_from_deadline",
+                'action' => "newOrderSaveDeadlineAndAddAttachmentsAndNotes",
                 'data' => $item['data'],
             ]);
         }

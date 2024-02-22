@@ -99,14 +99,14 @@ class Order extends Model
         return view("messages.order_info", compact("order"))->render();
     }
 
-    public function publishOrder(User $user): bool
+    public function publishOrder(User $user)
     {
         $order = $this->getDraftOrder($user);
         $order->update([
             "status" => "pending"
         ]);
 
-        return true;
+        return $order->id;
     }
 
     public function category(): HasOne // Получить категорию

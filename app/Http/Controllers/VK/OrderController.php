@@ -7,6 +7,8 @@ use App\Models\Order;
 use App\Models\User;
 use DigitalStars\SimpleVK\SimpleVK;
 use DigitalStars\SimpleVK\SimpleVkException;
+use Illuminate\Database\Eloquent\Model;
+use Throwable;
 
 
 class OrderController extends Controller
@@ -38,14 +40,11 @@ class OrderController extends Controller
      */
     public function init(): void
     {
-
         // Управление логикой при формировании нового заказа
         $this->newOrderLogic();
 
         // Управление логикой Моих заказов
         $this->myOrdersLogic();
-
-
     }
 
     /**
@@ -93,14 +92,61 @@ class OrderController extends Controller
         $this->bot->msg("$message")->kbd($this->button->whatYouNeedHelpWith())->send();
     }
 
-    // Сохранить с чем необходима помощь и показать список сроков
-    private function newOrderSaveWhatYouNeedHelpWithAndShowDeadlines()
-    {
 
+    /**
+     * @throws SimpleVkException
+     */
+    // Сохранить с чем необходима помощь и показать список сроков
+    private function newOrderSaveWhatYouNeedHelpWithAndShowDeadlines(): void
+    {
+        $need_help_with = $this->data;
+        $this->order->addWhatYouNeedHelpWith($this->user, $need_help_with);
+
+        $message = "Укажите требуемые сроки";
+        $this->bot->msg("$message")->kbd($this->button->deadlines())->send();
     }
 
     /**
      * @throws SimpleVkException
+     * @throws Throwable
+     */
+    // Сохранить сроки, показать информацию о заказе, назначить куки для обработки текстовых сообщений
+    private function newOrderSaveDeadlineAndAddAttachmentsAndNotes(): void
+    {
+        $deadline = $this->data;
+        $this->order->addDeadline($this->user, $deadline);
+
+        // Получить ИД заказа, чтобы внести куки и затем обработать вложения по этому заказу
+        $order = new Order();
+        $order = $order->getDraftOrder($this->user);
+
+        $this->user->update([
+            "cookie" => "add_attachments_student_order=$order->id"
+        ]);
+
+        // Информация о заказе
+        $order_info = $order->getInfoByOrderId($order->id);
+        $this->bot->msg("$order_info")->kbd($this->button->publishOrder())->send();
+    }
+
+    /**
+     * @throws SimpleVkException
+     */
+    // Опубликовать заявку
+    private function publishOrder(): void
+    {
+        // Публикация заказа
+        $order_id = $this->order->publishOrder($this->user);
+
+        $this->bot->msg("Ваша заявка (№ $order_id) опубликована, ожидайте ответа помощников.")
+            ->kbd($this->button->mainMenuButton())
+            ->send();
+    }
+
+
+    /**
+     * @throws SimpleVkException
+     * @throws Throwable
      */
     private function newOrderLogic(): void
     {
@@ -120,7 +166,19 @@ class OrderController extends Controller
 
         // Пользователь выбрал с чем необходима помощь (save) -> Показать ему список сроков
         if ($this->action == "newOrderSaveWhatYouNeedHelpWithAndShowDeadlines") {
+            $this->newOrderSaveWhatYouNeedHelpWithAndShowDeadlines();
+        }
 
+        // Пользователь выбрал сроки (save) -> Показать информацию о заказе,
+        // При необходимости сохранить вложения и примечания
+        if ($this->action == "newOrderSaveDeadlineAndAddAttachmentsAndNotes") {
+            $this->newOrderSaveDeadlineAndAddAttachmentsAndNotes();
+        }
+
+        // Опубликовать новый заказ
+        if (($this->action == "publish_order")) {
+            $this->bot->eventAnswerSnackbar("Заявка опубликована");
+            $this->publishOrder();
         }
 
 
