@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
+use App\Models\Log;
 use App\Models\Order;
 use App\Models\User;
 use DigitalStars\SimpleVK\SimpleVK;
 use DigitalStars\SimpleVK\SimpleVkException;
-use Illuminate\Database\Eloquent\Model;
 use Throwable;
 
 
@@ -36,7 +36,7 @@ class OrderController extends Controller
     }
 
     /**
-     * @throws SimpleVkException
+     * @throws SimpleVkException|Throwable
      */
     public function init(): void
     {
@@ -73,7 +73,9 @@ class OrderController extends Controller
     private function newOrderSaveCategoryAndShowSubject(): void
     {
         $category_id = $this->data;
-        $this->order->addSubject($this->user, $category_id);
+        $this->order->addCategory($this->user, $category_id);
+         $this->bot->reply($category_id);
+
 
         $message = "Выберите с чем нужна помощь";
         $this->bot->msg("$message")->kbd($this->button->subjects($category_id))->send();
@@ -138,6 +140,8 @@ class OrderController extends Controller
     {
         // Публикация заказа
         $order_id = $this->order->publishOrder($this->user);
+
+        Log::add($this->user->id, "Создание заказа", Order::class, "$order_id");
 
         $this->bot->msg("Ваша заявка (№ $order_id) опубликована, ожидайте ответа помощников.")
             ->kbd($this->button->mainMenuButton())
@@ -218,7 +222,9 @@ class OrderController extends Controller
 
     }
 
-    /** Список заказов пользователя */
+    /** Список заказов пользователя
+     * @throws SimpleVkException
+     */
     private function myOrders(): void
     {
         if (Order::where("user_id", $this->user->id)->count() == 0) {
@@ -236,7 +242,7 @@ class OrderController extends Controller
      */
     private function _viewOrder(): void
     {
-        $order_id = $this->payload['data'];
+        $order_id = $this->data;
         $order = Order::findOrFail($order_id);
 
         $message = view("messages.order_view", compact("order"))->render();
@@ -250,7 +256,7 @@ class OrderController extends Controller
      */
     private function _deleteOrder(): void
     {
-        $order_id = $this->payload['data'];
+        $order_id = $this->data;
         $order = Order::findOrFail($order_id);
         $order->delete();
 
@@ -259,9 +265,12 @@ class OrderController extends Controller
         $this->bot->msg("$message")->kbd($this->button->getOrdersByUser($this->user))->send();
     }
 
+    /**
+     * @throws SimpleVkException
+     */
     private function _boostSearchSpecialist(): void
     {
-        $order_id = $this->payload['data'];
+        $order_id = $this->data;
         $order = Order::findOrFail($order_id);
 
         $this->bot->eventAnswerSnackbar("Ускорить поиск исполнителя");

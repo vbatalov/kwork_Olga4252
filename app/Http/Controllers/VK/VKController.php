@@ -5,6 +5,7 @@ namespace App\Http\Controllers\VK;
 use App\Http\Controllers\Controller;
 
 
+use App\Models\Order;
 use App\Models\User;
 
 use DigitalStars\SimpleVK\{Bot, Diagnostics, SimpleVK as vk};
@@ -48,6 +49,7 @@ class VKController extends Controller
             if ($user->count() < 1) {
                 return $this->bot->reply("ERROR: User not identify");
             }
+
 
             /** Обработка нажатий на кнопки */
             if ($type == "message_event" or (isset($payload))) {

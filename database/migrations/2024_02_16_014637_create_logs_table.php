@@ -13,6 +13,11 @@ return new class extends Migration
     {
         Schema::create('logs', function (Blueprint $table) {
             $table->id();
+            $table->integer("user_id");
+            $table->string("action");
+            $table->integer("action_id")->nullable();
+            $table->string("class")->nullable();
+            $table->string("author")->default("system");
             $table->timestamps();
         });
     }
