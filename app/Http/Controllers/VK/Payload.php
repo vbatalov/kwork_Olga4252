@@ -42,13 +42,9 @@ class Payload extends Controller
             if (isset($this->payload) and (isset($this->payload['action']))) {
 
                 $action = $this->payload['action'];
+                $orderController = new OrderController($this->bot, $this->user, $this->payload);
+                $orderController->init();
 
-                /** Просмотр заказа и управление */
-                if ($this->payload['action'] == "view_order") {
-                    return $this->_viewOrder();
-                } elseif ($this->payload['action'] == "delete_order") {
-                    return $this->_deleteOrder();
-                }
                 /** События при клике в главном меню */
                 if ($this->payload['action'] == "click_from_main_menu") {
                     return $this->_MenuController();
@@ -221,6 +217,9 @@ class Payload extends Controller
                 return $this->bot->msg("$message")->kbd($this->button->getOrdersByUser($this->user))->send();
             }
 
+
+
+
             $this->bot->eventAnswerSnackbar("После нажатия на кнопку ничего не произошло (_MenuController)");
 
         } catch (SimpleVkException $e) {
@@ -228,33 +227,5 @@ class Payload extends Controller
         }
 
         return true;
-    }
-
-    /**
-     * Показать информацию о заказе
-     * @throws Throwable
-     * @throws SimpleVkException
-     */
-    private function _viewOrder()
-    {
-        $order_id = $this->payload['data'];
-        $order = Order::findOrFail($order_id);
-
-        $message = view("messages.order_view", compact("order"))->render();
-        $this->bot->eventAnswerSnackbar("Управлением заказом");
-        return $this->bot->msg("$message")->kbd($this->button->orderActions($order))->send();
-
-    }
-
-    /** Удаление заказа (необходимо подтверждение) */
-    private function _deleteOrder()
-    {
-        $order_id = $this->payload['data'];
-        $order = Order::findOrFail($order_id);
-        $order->delete();
-
-        $message = "Ваша заявка удалена.";
-        $this->bot->eventAnswerSnackbar("Заявка удалена");
-        return $this->bot->msg("$message")->kbd($this->button->getOrdersByUser($this->user))->send();
     }
 }

@@ -8,7 +8,6 @@ use App\Models\Order;
 use App\Models\Subject;
 use App\Models\User;
 use Carbon\Carbon;
-use Carbon\Traits\Date;
 
 class Buttons extends Controller
 {
@@ -24,14 +23,14 @@ class Buttons extends Controller
     {
         $items = [
             [
-                "text" => "Новый заказ",
-                "color" => "white",
+                "text" => "Опубликовать",
+                "color" => "green",
                 "data" => "new_order",
 
             ],
             [
                 "text" => "Мои заказы",
-                "color" => "white",
+                "color" => "blue",
                 "data" => "my_orders",
 
             ],
@@ -54,8 +53,8 @@ class Buttons extends Controller
         foreach ($items as $item) {
             $buttons [] = [
                 $this->vk->bot->buttonCallback($item['text'], $item['color'], [
-                    "action" => "click_from_main_menu",
-                    "data" => $item['data'],
+                    "action" => $item['data'],
+//                    "data" => null,
                 ])
             ];
         }
@@ -70,7 +69,7 @@ class Buttons extends Controller
         $buttons = [];
 
         foreach ($categories as $category) {
-            $buttons[] = $this->vk->bot->buttonCallback($category->name, 'white', [
+            $buttons[] = $this->vk->bot->buttonCallback($category->name, 'blue', [
                 "action" => "click_from_category",
                 'data' => "$category->id"
             ]);
@@ -89,7 +88,7 @@ class Buttons extends Controller
 
         foreach ($items as $item) {
             $name_filter = mb_strimwidth($item->name, 0, 40);
-            $buttons[] = $this->vk->bot->buttonCallback($name_filter, 'white', [
+            $buttons[] = $this->vk->bot->buttonCallback($name_filter, 'blue', [
                 'action' => "click_from_subject",
                 'data' => "$item->id"
             ]);
@@ -114,7 +113,7 @@ class Buttons extends Controller
         $buttons = [];
 
         foreach ($items as $item) {
-            $buttons[] = $this->vk->bot->buttonCallback($item, 'white', [
+            $buttons[] = $this->vk->bot->buttonCallback($item, 'blue', [
                 'action' => "click_from_is_whatYouNeedHelpWith",
                 'data' => $item,
             ]);
@@ -136,15 +135,15 @@ class Buttons extends Controller
             ],
             [
                 "title" => "1 день",
-                "data" => Carbon::now()->add("1 day"),
+                "data" => "1 день",
             ],
             [
                 "title" => "2-3 дня",
-                "data" => Carbon::now()->add("3 day"),
+                "data" => "2-3 дня",
             ],
             [
                 "title" => "4-7 дней",
-                "data" => Carbon::now()->add("7 day"),
+                "data" => "4-7 дней",
             ],
             [
                 "title" => "Более недели",
@@ -154,7 +153,7 @@ class Buttons extends Controller
         $buttons = [];
 
         foreach ($items as $item) {
-            $buttons[] = $this->vk->bot->buttonCallback($item['title'], 'white', [
+            $buttons[] = $this->vk->bot->buttonCallback($item['title'], 'blue', [
                 'action' => "click_from_deadline",
                 'data' => $item['data'],
             ]);
@@ -169,7 +168,7 @@ class Buttons extends Controller
     /** Опубликовать заявку */
     public function publishOrder()
     {
-        $buttons[] = $this->vk->bot->buttonCallback("Опубликовать заказ", 'white', [
+        $buttons[] = $this->vk->bot->buttonCallback("Опубликовать заказ", 'green', [
             'action' => "publish_order",
             'data' => "publish_order",
         ]);
@@ -188,7 +187,7 @@ class Buttons extends Controller
         foreach ($orders as $order) {
             $category_name = $order->category->name; // Наименование категории заказа
 
-            $buttons[] = $this->vk->bot->buttonCallback("Заказ № $order->id ($category_name)", 'white', [
+            $buttons[] = $this->vk->bot->buttonCallback("Заказ № $order->id ($category_name)", 'blue', [
                 'action' => "view_order",
                 'data' => "$order->id",
             ]);
@@ -199,18 +198,39 @@ class Buttons extends Controller
         return $chunk;
     }
 
+
+    public function boostSearchSpecialist(Order $order)
+    {
+
+        $buttons = [];
+
+        $buttons[] = $this->vk->bot->buttonCallback("Оплатить на карту Сбербанк", "blue", [
+            'action' => "payBoostSearchSpecialist_bySberbank",
+            'data' => $order->id,
+        ]);
+
+        $buttons[] = $this->vk->bot->buttonCallback("Оплатить с YooКасса", "blue", [
+            'action' => "payBoostSearchSpecialist_byYouKassa",
+            'data' => $order->id,
+        ]);
+
+        $chunk = array_chunk($buttons, 1);
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
     /** Действия с заказом */
     public function orderActions(Order $order)
     {
 
         $items =
             [
-//                [
-//                    "text" => 'Редактировать заказ',
-//                    "action" => 'edit_order',
-//                    "color" => "white",
-//                    "data" => $order->id,
-//                ],
+                [
+                    "text" => 'Ускорить поиск исполнителя',
+                    "action" => 'boost_search_specialist',
+                    "color" => "green",
+                    "data" => $order->id,
+                ],
                 [
                     "text" => 'Удалить заказ',
                     "color" => "red",
@@ -228,6 +248,7 @@ class Buttons extends Controller
         }
 
         $chunk = array_chunk($buttons, 1);
+//        $chunk [] = [$this->goBack("my_orders")]; // TODO: не работает, т.к. payload с главного меню click_from_main_menu, а затем my_orders
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;
     }
@@ -246,10 +267,11 @@ class Buttons extends Controller
             'action' => "$action"
         ]);
     }
+
     /** Кнопка главное меню */
     public function mainMenuButton()
     {
-        return $this->vk->bot->buttonCallback("Главное меню", 'blue', [
+        return $this->vk->bot->buttonCallback("Главное меню", 'white', [
             'data' => "menu",
             'action' => "return_to_home"
         ]);
