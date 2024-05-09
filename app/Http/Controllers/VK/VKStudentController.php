@@ -15,7 +15,7 @@ use Throwable;
 
 // TODO: в методе getAttachments удалить return 0 на второй строке
 
-class VKController extends Controller
+class VKStudentController extends Controller
 {
     public string $confirm;
     public vk $bot;

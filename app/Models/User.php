@@ -4,7 +4,7 @@ namespace App\Models;
 
 
 use App\Http\Controllers\VK\Buttons;
-use App\Http\Controllers\VK\VKController;
+use App\Http\Controllers\VK\VKStudentController;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,11 +24,11 @@ class User extends Model
     public string $peer_id;
     public array $userInfo;
 
-    public VKController $vk;
+    public VKStudentController $vk;
 
     public function __construct()
     {
-        $this->vk = new VKController();
+        $this->vk = new VKStudentController();
     }
 
     /** Начальное сообщение */

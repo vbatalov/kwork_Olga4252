@@ -11,11 +11,11 @@ use Carbon\Carbon;
 
 class Buttons extends Controller
 {
-    public VKController $vk;
+    public VKStudentController $vk;
 
     public function __construct()
     {
-        $this->vk = new VKController();
+        $this->vk = new VKStudentController();
     }
 
     /** Главное меню */

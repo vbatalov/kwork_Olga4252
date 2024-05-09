@@ -8,6 +8,9 @@ return [
     "VK_TOKEN" => env("VK_TOKEN"),
     "VK_CONFIRM" => env("VK_CONFIRM"),
 
+    "VK_TOKEN_SPECIALIST" => env("VK_TOKEN_SPECIALIST"),
+    "VK_CONFIRM_SPECIALIST" => env("VK_CONFIRM_SPECIALIST"),
+
 
     /*
     |--------------------------------------------------------------------------
