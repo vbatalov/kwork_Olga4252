@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
+use App\Models\Specialist;
 use App\Models\User;
 use DigitalStars\SimpleVK\Diagnostics;
 use DigitalStars\SimpleVK\SimpleVK as vk;
@@ -35,15 +36,17 @@ class VKSpecialistController extends Controller
     {
         try {
 
+
             /** Init Vars */
             $this->bot->initVars($peer_id, $user_id, $type, $message, $payload, $id, $attachments);
 
             /** Модель пользователя */
-            $user = new User();
-            $user = $user->init($this->bot->userInfo($peer_id));
+            $user = new Specialist();
+            $user->init(user_info: $this->bot->userInfo($user_id));
             if ($user->count() < 1) {
                 return $this->bot->reply("ERROR: User not identify");
             }
+            return true;
 
 
             /** Обработка нажатий на кнопки */

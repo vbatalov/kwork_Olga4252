@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\VK\VKSpecialistController;
 use App\Http\Controllers\VK\VKStudentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,5 +22,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::controller(VKStudentController::class)->group(function () {
     Route::post("vk_bot", "controller");
+    Route::get("diagnostics", "diagnostics");
+});
+
+Route::controller(VKSpecialistController::class)->group(function () {
+    Route::post("vk_bot_specialist", "controller");
     Route::get("diagnostics", "diagnostics");
 });
