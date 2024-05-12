@@ -85,7 +85,11 @@ class OrderSpecialistController extends Controller
         }
 
         if ($this->action == "offer_price") {
-            $this->offer_price();
+            $this->specialist->update([
+                "cookie" => "offer_price_id_" . $this->data
+            ]);
+
+            $this->offer_price(order_id: $this->data);
         }
     }
 
@@ -100,8 +104,10 @@ class OrderSpecialistController extends Controller
     }
 
     // Предложить цену
-    private function offer_price()
+    private function offer_price($order_id)
     {
+
+        $this->bot->reply("Укажите цену");
     }
 
 }
