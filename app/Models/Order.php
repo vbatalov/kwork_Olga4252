@@ -23,6 +23,11 @@ class Order extends Model
         "deadline" => "string"
     ];
 
+    public function getAvailableOrders($offset = 0)
+    {
+        return Order::where("status", "pending")->offset($offset)->limit(5)->get();
+    }
+
     /** Создание заказа при клике "Новый заказ"
      * Создает новый черновик (если заказа не было, или возвращает последний активный черновик)
      */
@@ -113,6 +118,7 @@ class Order extends Model
     {
         return $this->hasOne(Category::class, "id", "category_id");
     }
+
     public function subject(): HasOne // Получить предмет
     {
         return $this->hasOne(Subject::class, "id", "subject_id");

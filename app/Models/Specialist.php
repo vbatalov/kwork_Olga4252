@@ -3,12 +3,21 @@
 namespace App\Models;
 
 use App\Http\Controllers\VK\Buttons;
+use App\Http\Controllers\VK\ButtonsSpecialist;
 use App\Http\Controllers\VK\VKSpecialistController;
 use Illuminate\Database\Eloquent\Model;
 
 class Specialist extends Model
 {
-    protected $table = "users";
+    protected $table = "specialists";
+    protected $fillable = [
+        "peer_id",
+        "name",
+        "surname",
+        "role",
+        "percent",
+        "cookie",
+    ];
 
     public VKSpecialistController $vk;
 
@@ -17,16 +26,16 @@ class Specialist extends Model
         $this->vk = new VKSpecialistController();
     }
 
-    public function init($user_info): User
+    public function init($user_info): Specialist
     {
         /** Если пользователь новый, отправляю приветственное сообщение */
-        if (!User::where("peer_id", $user_info['id'])->exists()) {
-//            $this->messageStart();
+        if (!$this::where("peer_id", $user_info['id'])->exists()) {
+            $this->messageStart();
         }
 
         /** Инициализация пользователя и/или создание нового */
 
-        $user = User::updateOrCreate(
+        return $this::updateOrCreate(
             [
                 "peer_id" => $user_info['id'],
             ],
@@ -36,14 +45,13 @@ class Specialist extends Model
             ]
         );
 
-        $this->user = $user;
-        return $user;
+
     }
 
     private function messageStart(): void
     {
-        $button = new Buttons();
-        $message = view("messages.start")->render();
+        $button = new ButtonsSpecialist();
+        $message = view("messages_specialist.start")->render();
         $this->vk->bot->msg("$message")->kbd($button->mainMenu())->send();
     }
 }

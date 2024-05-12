@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use App\Models\Specialist;
 use App\Models\User;
 use DigitalStars\SimpleVK\Diagnostics;
@@ -40,41 +41,38 @@ class VKSpecialistController extends Controller
             /** Init Vars */
             $this->bot->initVars($peer_id, $user_id, $type, $message, $payload, $id, $attachments);
 
-            /** Модель пользователя */
-            $user = new Specialist();
-            $user->init(user_info: $this->bot->userInfo($user_id));
-            if ($user->count() < 1) {
+            /** Модель специалиста */
+            $specialist = new Specialist();
+            $specialist->init(user_info: $this->bot->userInfo($user_id));
+            if ($specialist->count() < 1) {
                 return $this->bot->reply("ERROR: User not identify");
             }
-            return true;
 
 
             /** Обработка нажатий на кнопки */
             if ($type == "message_event" or (isset($payload))) {
-                $payload = new Payload($this->bot, $user, $payload); // init
+                $payload = new PayloadSpecialist($this->bot, $specialist, $payload); // init
 
-                // Обработка нажатий на кнопки студента
-                if ($user->role == 'student') {
-                    return $payload->StudentPayloadController();
-                }
+                return $payload->SpecialistPayloadController();
+
             }
 
             /** Обработка текстовых сообщений */
-            if ($type == "message_new") {
-                $messages = new Messages($this->bot, $user); // init
-
-                // Обработка сообщений от студента
-                if ($user->role == 'student') {
-//                    $this->bot->reply("DEBUG Role: student");
-//                    $this->bot->reply("DEBUG Cookie: $user->cookie");
-
-                    return $messages->StudentMessageController($this->bot->getAttachments(), $message);
-                }
-
-                if ($user->role == "specialist") {
-                    $this->bot->reply("Обработка сообщений специалиста не настроена");
-                }
-            }
+//            if ($type == "message_new") {
+//                $messages = new Messages($this->bot, $specialist); // init
+//
+//                // Обработка сообщений от студента
+//                if ($specialist->role == 'student') {
+////                    $this->bot->reply("DEBUG Role: student");
+////                    $this->bot->reply("DEBUG Cookie: $user->cookie");
+//
+//                    return $messages->StudentMessageController($this->bot->getAttachments(), $message);
+//                }
+//
+//                if ($specialist->role == "specialist") {
+//                    $this->bot->reply("Обработка сообщений специалиста не настроена");
+//                }
+//            }
 
 
         } catch (\Throwable $t) {
@@ -84,5 +82,11 @@ class VKSpecialistController extends Controller
         }
 
         return true;
+    }
+
+    public function orders_available()
+    {
+        $order = new Order();
+        return $order->getAvailableOrders();
     }
 }

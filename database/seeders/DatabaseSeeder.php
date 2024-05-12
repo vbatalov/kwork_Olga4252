@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Category;
+use App\Models\Order;
 use App\Models\Subject;
 use Illuminate\Database\Seeder;
 
@@ -341,5 +342,18 @@ class DatabaseSeeder extends Seeder
                 ]);
             }
         }
+
+
+        Order::create([
+            "user_id" => "1",
+            "category_id" => "1",
+            "subject_id" => "1",
+            "need_help_with" => "Диплом",
+            "description" => "",
+            "deadline" => "2-3 дня",
+            "status" => "pending",
+            "executor_id" => "",
+            "completion_date" => "",
+        ]);
     }
 }

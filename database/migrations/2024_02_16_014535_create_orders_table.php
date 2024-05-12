@@ -4,8 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -19,7 +18,9 @@ return new class extends Migration
             $table->longText("need_help_with")->nullable();
             $table->longText("description")->nullable();
             $table->string("deadline")->nullable();
-            $table->string("status")->default("draft");
+            $table->enum("status", [
+                "draft", "pending", "wait_payment", "progress", "finish"
+            ])->default("draft");
             $table->integer("executor_id")->nullable();
             $table->string("completion_date")->nullable();
             $table->timestamps();
