@@ -49,9 +49,6 @@ class Payload extends Controller
                 $orderController->init();
 
 
-
-
-
                 /** Возврат в главное меню */
                 if ($action == "return_to_home") {
                     $message = view("messages.start");

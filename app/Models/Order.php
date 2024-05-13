@@ -51,6 +51,14 @@ class Order extends Model
         return true;
     }
 
+    /** Функция возвращает первый существующий черовник заказа */
+    public function getDraftOrder(User $user): Order
+    {
+        return Order::where("user_id", $user->id)
+            ->where("status", "draft")
+            ->firstOrFail();
+    }
+
     /** Добавить предмет в заказ */
     public function addSubject(User $user, $subject_id): bool
     {
@@ -86,14 +94,6 @@ class Order extends Model
         return true;
     }
 
-    /** Функция возвращает первый существующий черовник заказа */
-    public function getDraftOrder(User $user): Order
-    {
-        return Order::where("user_id", $user->id)
-            ->where("status", "draft")
-            ->firstOrFail();
-    }
-
     /**
      * @throws \Throwable
      */
@@ -122,5 +122,14 @@ class Order extends Model
     public function subject(): HasOne // Получить предмет
     {
         return $this->hasOne(Subject::class, "id", "subject_id");
+    }
+
+    public function user(): HasOne // Получить пользователя
+    {
+        return $this->hasOne(User::class, "id", "user_id");
+    }
+    public function response(): HasOne // Получить отклик
+    {
+        return $this->hasOne(Response::class, "order_id", "id");
     }
 }

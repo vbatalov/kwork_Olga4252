@@ -20,10 +20,6 @@ class User extends Model
     ];
 
     public User $user;
-
-    public string $peer_id;
-    public array $userInfo;
-
     public VKStudentController $vk;
 
     public function __construct()

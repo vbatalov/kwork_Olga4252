@@ -7,7 +7,6 @@ use App\Models\Category;
 use App\Models\Order;
 use App\Models\Subject;
 use App\Models\User;
-use Carbon\Carbon;
 
 class Buttons extends Controller
 {
@@ -78,6 +77,15 @@ class Buttons extends Controller
         $chunk = array_chunk($buttons, 2);
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;
+    }
+
+    /** Кнопка главное меню */
+    public function mainMenuButton()
+    {
+        return $this->vk->bot->buttonCallback("Главное меню", 'white', [
+            'data' => "menu",
+            'action' => "return_to_home"
+        ]);
     }
 
     /** Меню предметов в категории */
@@ -165,6 +173,13 @@ class Buttons extends Controller
         return $chunk;
     }
 
+    public function goBack($action, $text = "Назад")
+    {
+        return $this->vk->bot->buttonCallback("$text", 'white', [
+            'action' => "$action"
+        ]);
+    }
+
     /** Опубликовать заявку */
     public function publishOrder()
     {
@@ -197,7 +212,6 @@ class Buttons extends Controller
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;
     }
-
 
     public function boostSearchSpecialist(Order $order)
     {
@@ -260,20 +274,11 @@ class Buttons extends Controller
         ]);
     }
 
-
-    public function goBack($action, $text = "Назад")
+    public function startChatWithSpecialist($specialist_id)
     {
-        return $this->vk->bot->buttonCallback("$text", 'white', [
-            'action' => "$action"
+        return $this->vk->bot->buttonCallback(text: "Начать чат", color: "green", payload: [
+            "chat_with" => $specialist_id
         ]);
-    }
 
-    /** Кнопка главное меню */
-    public function mainMenuButton()
-    {
-        return $this->vk->bot->buttonCallback("Главное меню", 'white', [
-            'data' => "menu",
-            'action' => "return_to_home"
-        ]);
     }
 }

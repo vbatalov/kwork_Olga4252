@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Order;
 use App\Models\Subject;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -354,6 +355,10 @@ class DatabaseSeeder extends Seeder
             "status" => "pending",
             "executor_id" => "",
             "completion_date" => "",
+        ]);
+        User::create([
+            "peer_id" => 120637023,
+            "role" => "student"
         ]);
     }
 }

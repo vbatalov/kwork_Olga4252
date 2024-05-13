@@ -3,13 +3,7 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
-use App\Models\Category;
-use App\Models\Order;
-use App\Models\Subject;
-use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Http;
 
 class ButtonsSpecialist extends Controller
 {
@@ -99,17 +93,26 @@ class ButtonsSpecialist extends Controller
         return $chunk;
     }
 
+    /** Кнопка главное меню */
+    public
+    function mainMenuButton()
+    {
+        return $this->vk->bot->buttonCallback("Главное меню", 'white', [
+            'data' => "menu",
+            'action' => "return_to_home"
+        ]);
+    }
+
     public function view_order($order_id, $offset)
     {
-
-
         $buttons = [];
         $chunk = array_chunk($buttons, 2);
 
         $offer_price = $this->vk->bot->buttonCallback(text: "Предложить цену",
             color: 'green', payload: [
                 "action" => "offer_price",
-                'data' => $order_id
+                'data' => $order_id,
+                'offset' => $offset
             ]);
 
         $paginate = $this->vk->bot->buttonCallback(text: "Назад",
@@ -127,22 +130,76 @@ class ButtonsSpecialist extends Controller
         return $chunk;
     }
 
+    public function send_response_price($offset)
+    {
+        $buttons = [];
+        $chunk = array_chunk($buttons, 2);
 
-    public
-    function goBack($action, $text = "Назад")
+
+        $paginate = $this->vk->bot->buttonCallback(text: "Назад",
+            color: 'blue', payload: [
+                "action" => "orders_available",
+                'data' => $offset
+            ]);
+
+
+        $chunk [] = [$paginate];
+
+
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
+    public function send_response($order_id)
+    {
+        $buttons = [];
+        $chunk = array_chunk($buttons, 2);
+
+
+        $send_response = $this->vk->bot->buttonCallback(text: "Отправить предложение",
+            color: 'green', payload: [
+                "action" => "send_response",
+                'data' => $order_id
+            ]);
+
+        $paginate = $this->vk->bot->buttonCallback(text: "Вернуться к списку заказов",
+            color: 'blue', payload: [
+                "action" => "orders_available",
+                'data' => 0
+            ]);
+
+
+        $chunk [] = [$send_response];
+        $chunk [] = [$paginate];
+
+
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
+    public function ordersOrMainMenu()
+    {
+        $buttons = [];
+        $chunk = array_chunk($buttons, 2);
+
+
+        $paginate = $this->vk->bot->buttonCallback(text: "Вернуться к списку заказов",
+            color: 'blue', payload: [
+                "action" => "orders_available",
+                'data' => 0
+            ]);
+
+        $chunk [] = [$paginate];
+
+
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
+    public function goBack($action, $text = "Назад")
     {
         return $this->vk->bot->buttonCallback("$text", 'white', [
             'action' => "$action"
-        ]);
-    }
-
-    /** Кнопка главное меню */
-    public
-    function mainMenuButton()
-    {
-        return $this->vk->bot->buttonCallback("Главное меню", 'white', [
-            'data' => "menu",
-            'action' => "return_to_home"
         ]);
     }
 }

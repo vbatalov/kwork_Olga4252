@@ -13,6 +13,13 @@ return new class extends Migration
     {
         Schema::create('responses', function (Blueprint $table) {
             $table->id();
+            $table->string("order_id");
+            $table->string("executor_id");
+            $table->double("price");
+            $table->string("note")->nullable();
+            $table->enum("status", [
+                "draft", "awaits", "accepted", "rejected"
+            ])->default("draft");
             $table->timestamps();
         });
     }
