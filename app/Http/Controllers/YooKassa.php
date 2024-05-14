@@ -70,6 +70,8 @@ class YooKassa extends Controller
         $specialist_vk = new VKSpecialistController();
         $specialist_vk->bot->msg("Заказчик оплатил заказ № $order->id")->send($specialist->peer_id);
 
+        \App\Models\Log::add(user_id: $order->user_id, action: "Заказ оплачен", class: Order::class, action_id: $order->id);
+
 
         print_r($object);
     }
