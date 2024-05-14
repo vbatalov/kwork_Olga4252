@@ -19,6 +19,7 @@ class OrderSpecialistController extends Controller
     public string $action;
     public string $data;
     public string $offset;
+    public string $chat_with;
 
     public ButtonsSpecialist $button;
     public Buttons $buttonCostumer;
@@ -33,6 +34,7 @@ class OrderSpecialistController extends Controller
         $this->action = $payload['action'] ?? "null";
         $this->data = $payload['data'] ?? "null";
         $this->offset = $payload['offset'] ?? "null";
+        $this->chat_with = $payload['chat_with'] ?? "null";
 
         $this->order = new Order();
         $this->button = new ButtonsSpecialist();
@@ -74,6 +76,12 @@ class OrderSpecialistController extends Controller
         if ($this->action == "send_response") {
             $this->send_response(order_id: $this->data);
         }
+
+        if ($this->action == "chat_with") {
+
+            $this->start_chat_with_user();
+
+        }
     }
 
 
@@ -111,6 +119,7 @@ class OrderSpecialistController extends Controller
             "cookie" => "offer_price_id_" . $order_id
         ]);
 
+        $this->bot->eventAnswerSnackbar("Укажите цену");
         $this->bot->msg('Отправьте цену за выполнение следующим сообщением.')
             ->kbd($this->button->send_response_price($this->offset))->send();
 
@@ -118,12 +127,11 @@ class OrderSpecialistController extends Controller
 
     private function send_response($order_id)
     {
-        Response::setStatus(executor_id: $this->specialist->id, order_id: $order_id, status: "awaits");
+        Response::setStatus(order_id: $order_id, status: "awaits");
 
         $this->send_notification_to_costumer_about_new_response($order_id);
 
-        $this->bot->reply("remove here. die."); return;
-
+        $this->bot->eventAnswerSnackbar("Предложение направлено");
         $this->bot->msg("Предложение направлено заказчику.")
             ->kbd($this->button->ordersOrMainMenu())
             ->send();
@@ -138,8 +146,20 @@ class OrderSpecialistController extends Controller
 
         $VKStudentController = new VKStudentController();
         $VKStudentController->bot->msg("$message")
-            ->kbd($this->buttonCostumer->startChatWithSpecialist($this->specialist->id), true)
+            ->kbd($this->buttonCostumer->start_chat_with($this->specialist->id, $order_id), true)
             ->send($user->peer_id);
+    }
+
+    /**
+     * @return void
+     */
+    public function start_chat_with_user(): void
+    {
+        $this->bot->eventAnswerSnackbar("Отправьте сообщение");
+        $this->bot->reply("Вы начали чат с заказчиком. Отправьте сообщение.");
+        $this->specialist->update([
+            "cookie" => "chat_with_" . $this->chat_with . "|" . "order_id_" . $this->data,
+        ]);
     }
 
 }

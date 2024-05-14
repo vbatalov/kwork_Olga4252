@@ -5,6 +5,7 @@ namespace App\Http\Controllers\VK;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Specialist;
 use App\Models\Subject;
 use App\Models\User;
 
@@ -274,11 +275,24 @@ class Buttons extends Controller
         ]);
     }
 
-    public function startChatWithSpecialist($specialist_id)
+    public function start_chat_with($specialist_id, $order_id, $buttonAlert = false)
     {
+        if (!$buttonAlert) {
+            return $this->accept_offer($order_id);
+        }
+
         return $this->vk->bot->buttonCallback(text: "Начать чат", color: "green", payload: [
+            "action" => "chat_with",
+            "data" => $order_id,
             "chat_with" => $specialist_id
         ]);
+    }
 
+    private function accept_offer($order_id)
+    {
+        return $this->vk->bot->buttonCallback(text: "Принять предложение", color: "green", payload: [
+            "action" => "accept_offer",
+            "data" => $order_id,
+        ]);
     }
 }

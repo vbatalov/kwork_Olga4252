@@ -11,6 +11,9 @@ return [
     "VK_TOKEN_SPECIALIST" => env("VK_TOKEN_SPECIALIST"),
     "VK_CONFIRM_SPECIALIST" => env("VK_CONFIRM_SPECIALIST"),
 
+    "YOOKASSA_API" => env("YOOKASSA_API"),
+    "YOOKASSA_ID" => env("YOOKASSA_ID"),
+
 
     /*
     |--------------------------------------------------------------------------

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
+use App\Models\Specialist;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
 class ButtonsSpecialist extends Controller
@@ -175,6 +177,43 @@ class ButtonsSpecialist extends Controller
 
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;
+    }
+
+    public function start_chat_with($user_id, $order_id, $buttonAlert = false)
+    {
+        if (!$buttonAlert) {
+            return [[$this->change_response($order_id)], [$this->cancel_response($order_id)]];
+        }
+
+        return $this->button_start_chat($user_id, $order_id);
+    }
+
+    private function change_response($order_id)
+    {
+        return $this->vk->bot->buttonCallback(text: "Изменить предложение",
+            color: 'white', payload: [
+                "action" => "offer_price",
+                "data" => $order_id,
+            ]);
+    }
+
+    private function cancel_response($order_id)
+    {
+        return $this->vk->bot->buttonCallback(text: "Отменить предложение",
+            color: 'red', payload: [
+                "action" => "cancel_response",
+                "data" => $order_id,
+            ]);
+    }
+
+    public function button_start_chat($user_id, $order_id)
+    {
+        return $this->vk->bot->buttonCallback(text: "Начать чат",
+            color: 'green', payload: [
+                "action" => "chat_with",
+                "data" => $order_id,
+                "chat_with" => $user_id
+            ]);
     }
 
     public function ordersOrMainMenu()

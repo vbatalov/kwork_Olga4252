@@ -41,12 +41,11 @@ class Response extends Model
             ]);
     }
 
-    public static function setStatus($executor_id, $order_id, $status): void
+    public static function setStatus($order_id, $status): void
     {
         Response::where(
             [
                 "order_id" => $order_id,
-                "executor_id" => $executor_id
             ],
         )->update(
             [

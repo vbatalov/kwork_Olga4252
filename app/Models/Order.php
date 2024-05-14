@@ -114,6 +114,13 @@ class Order extends Model
         return $order->id;
     }
 
+    public static function setStatus($order_id, $status): void
+    {
+        Order::findOrFail($order_id)->update([
+            "status" => "$status"
+        ]);
+    }
+
     public function category(): HasOne // Получить категорию
     {
         return $this->hasOne(Category::class, "id", "category_id");
@@ -128,6 +135,7 @@ class Order extends Model
     {
         return $this->hasOne(User::class, "id", "user_id");
     }
+
     public function response(): HasOne // Получить отклик
     {
         return $this->hasOne(Response::class, "order_id", "id");

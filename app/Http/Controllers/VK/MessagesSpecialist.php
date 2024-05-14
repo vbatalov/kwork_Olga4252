@@ -4,8 +4,10 @@ namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
 use App\Models\Attachment;
+use App\Models\Message;
 use App\Models\Response;
 use App\Models\Specialist;
+use App\Models\User;
 use DigitalStars\SimpleVK\SimpleVK;
 use DigitalStars\SimpleVK\SimpleVkException;
 use Log;
@@ -16,6 +18,7 @@ class MessagesSpecialist extends Controller
     public Specialist $specialist;
 
     public ButtonsSpecialist $button;
+    public Buttons $buttonUser;
 
     public Attachment $attachments;
 
@@ -25,6 +28,7 @@ class MessagesSpecialist extends Controller
         $this->specialist = $specialist;
 
         $this->button = new ButtonsSpecialist(); // кнопки меню
+        $this->buttonUser = new Buttons(); // кнопки меню
 
         $this->attachments = new Attachment(); // вложения
     }
@@ -40,6 +44,10 @@ class MessagesSpecialist extends Controller
             if ($cookie == null) {
                 $message = view("messages.start");
                 return $this->bot->msg("$message")->kbd($this->button->mainMenu())->send();
+            }
+
+            if (stripos("$cookie", "chat_with_") !== false) {
+                return $this->sendMessageToUser($cookie, $text);
             }
 
 
@@ -104,6 +112,36 @@ class MessagesSpecialist extends Controller
         $this->specialist->update([
             "cookie" => null
         ]);
+    }
+
+    private function sendMessageToUser(mixed $cookie, $text)
+    {
+        $str_replace = str_replace(["chat_with_", "order_id_"], "", $cookie);
+        $array = explode("|", $str_replace);
+
+        $user = $array[0];
+        $order_id = $array[1];
+
+        $user = User::findOrFail($user);
+
+        $VKSpecialistController = new VKStudentController();
+        $from = "specialist";
+
+        $buttonAlert = true;
+        if (stripos($user->cookie, "|order_id_$order_id") !== false) {
+            $buttonAlert = false;
+        }
+        $message = view("private_message", compact("text", "from", "order_id", "buttonAlert"))->render();
+
+        $VKSpecialistController->bot->msg("$message")
+            ->kbd($this->buttonUser->start_chat_with(specialist_id: $this->specialist->id, order_id: $order_id,buttonAlert: $buttonAlert), true)
+            ->send($user->peer_id);
+
+        Message::add(from: $this->specialist->id, sender: "specialist", to: $user->id, recipient: "user", order_id: $order_id, message: $text);
+
+        $this->bot->reply("Сообщение отправлено.");
+        return true;
+
     }
 
 

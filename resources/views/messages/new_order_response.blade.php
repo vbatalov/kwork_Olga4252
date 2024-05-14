@@ -8,5 +8,3 @@
 
 Цена: {{$order->response->price}}
 Комментарий: {{$order->response->note}}
-
-Чтобы начать чат, используйте меню.

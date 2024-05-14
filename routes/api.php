@@ -30,3 +30,7 @@ Route::controller(VKSpecialistController::class)->group(function () {
     Route::post("orders_available", "orders_available")->name("orders_available");
     Route::get("diagnostics", "diagnostics");
 });
+
+Route::controller(\App\Http\Controllers\YooKassa::class)->group(function () {
+    Route::post("payment_succeeded", "payment_succeeded");
+});

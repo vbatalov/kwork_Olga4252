@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\YooKassa;
 use App\Models\Log;
 use App\Models\Order;
+use App\Models\Response;
 use App\Models\User;
 use DigitalStars\SimpleVK\SimpleVK;
 use DigitalStars\SimpleVK\SimpleVkException;
@@ -18,6 +20,7 @@ class OrderController extends Controller
 
     public string $action;
     public string $data;
+    public string $chat_with;
 
     public Buttons $button;
 
@@ -30,6 +33,7 @@ class OrderController extends Controller
 
         $this->action = $payload['action'] ?? "null";
         $this->data = $payload['data'] ?? "null";
+        $this->chat_with = $payload['chat_with'] ?? "null";
 
         $this->order = new Order();
         $this->button = new Buttons();
@@ -45,6 +49,9 @@ class OrderController extends Controller
 
         // Управление логикой Моих заказов
         $this->myOrdersLogic();
+
+        // Управление логикой общения с исполнителем
+        $this->executorLogic();
     }
 
     /**
@@ -74,7 +81,7 @@ class OrderController extends Controller
     {
         $category_id = $this->data;
         $this->order->addCategory($this->user, $category_id);
-         $this->bot->reply($category_id);
+        $this->bot->reply($category_id);
 
 
         $message = "Выберите с чем нужна помощь";
@@ -277,6 +284,32 @@ class OrderController extends Controller
 
         $message = view("messages.boostSearchSpecialist")->render();
         $this->bot->msg("$message")->kbd($this->button->boostSearchSpecialist($order))->send();
+
+    }
+
+    private function executorLogic()
+    {
+        if ($this->action == 'chat_with') {
+            $this->bot->eventAnswerSnackbar("Отправьте сообщение");
+            $this->bot->reply("Вы начали чат с специалистом. Отправьте сообщение.");
+            $this->user->update([
+                "cookie" => "chat_with_" . $this->chat_with . "|" . "order_id_" . $this->data,
+            ]);
+        }
+        if ($this->action == "accept_offer") {
+            $this->bot->eventAnswerSnackbar("Необходимо оплатить заказ");
+
+            $response = Response::where("order_id", $this->data)->firstOrFail();
+            $yookassa = new YooKassa();
+            if ($payment = $yookassa->create(amount: $response->price, order_id: $response->order_id)){
+                $this->bot->reply("Для оплаты заказа перейдите по ссылке: $payment");
+            }
+
+            Order::setStatus("$this->data", "wait_payment");
+            Response::setStatus("$this->data", "accepted");
+            Log::add(user_id: $this->user->id, action: "Предложение исполнителя принято", class: Order::class, action_id: $this->data);
+        }
+
 
     }
 
