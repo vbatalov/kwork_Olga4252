@@ -149,6 +149,7 @@ class OrderController extends Controller
         $order_id = $this->order->publishOrder($this->user);
 
         Log::add($this->user->id, "Создание заказа", Order::class, "$order_id");
+        $this->user->update(["cookie" => null]);
 
         $this->bot->msg("Ваша заявка (№ $order_id) опубликована, ожидайте ответа помощников.")
             ->kbd($this->button->mainMenuButton())

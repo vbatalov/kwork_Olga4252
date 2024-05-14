@@ -130,6 +130,7 @@ class OrderSpecialistController extends Controller
         Response::setStatus(order_id: $order_id, status: "awaits");
 
         $this->send_notification_to_costumer_about_new_response($order_id);
+//        return;
 
         $this->bot->eventAnswerSnackbar("Предложение направлено");
         $this->bot->msg("Предложение направлено заказчику.")
@@ -146,7 +147,7 @@ class OrderSpecialistController extends Controller
 
         $VKStudentController = new VKStudentController();
         $VKStudentController->bot->msg("$message")
-            ->kbd($this->buttonCostumer->start_chat_with($this->specialist->id, $order_id), true)
+            ->kbd($this->buttonCostumer->start_chat_with($this->specialist->id, $order_id, true), true)
             ->send($user->peer_id);
     }
 
