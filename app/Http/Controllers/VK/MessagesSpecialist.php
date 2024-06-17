@@ -5,6 +5,7 @@ namespace App\Http\Controllers\VK;
 use App\Http\Controllers\Controller;
 use App\Models\Attachment;
 use App\Models\Message;
+use App\Models\Order;
 use App\Models\Response;
 use App\Models\Specialist;
 use App\Models\User;
@@ -49,6 +50,9 @@ class MessagesSpecialist extends Controller
             if (stripos("$cookie", "chat_with_") !== false) {
                 return $this->sendMessageToUser($cookie, $text);
             }
+            if (stripos("$cookie", "cancel_response_") !== false) {
+                return $this->confirm_cancel_response($cookie, $text);
+            }
 
 
             /** Предложение цены */
@@ -83,7 +87,8 @@ class MessagesSpecialist extends Controller
         if ($price > 0) {
             Response::addResponse(executor_id: $this->specialist->id, order_id: $order_id, price: $price);
 
-            $this->bot->reply("Цена сохранена. Теперь укажите примечание для заказчика, например, как вы будете решать его проблему.");
+            $price_with_percent = ($price * $this->specialist->percent) / 100;
+            $this->bot->reply("Цена сохранена. За выполнение заказа Вы получите $price_with_percent рублей. Теперь укажите примечание для заказчика, например, как вы будете решать его проблему.");
 
             $this->specialist->update([
                     "cookie" => "offer_note_id_" . $order_id
@@ -142,6 +147,40 @@ class MessagesSpecialist extends Controller
         $this->bot->reply("Сообщение отправлено.");
         return true;
 
+    }
+
+    private function confirm_cancel_response(mixed $cookie, $text)
+    {
+        $str_replace = str_replace("cancel_response_", "", $cookie);
+        $confirm_text = "Удалить отклик $str_replace";
+
+        if ($text === $confirm_text) {
+            $response = Response::where([
+                "executor_id" => $this->specialist->id,
+                "order_id" => $str_replace,
+            ])->firstOrFail();
+
+            $response->delete(); // удалил отклик
+
+            $order = Order::findOrFail($response->order_id);
+            $user = User::findOrFail($order->user_id);
+
+            $this->bot->reply("Ваш отклик на заказ удален.");
+
+            $studentBot = new VKStudentController();
+            $studentBot->bot->msg("Исполнитель удалил свой отклик на заказ №$str_replace")->send($user->peer_id);
+
+            // обнуляю куки
+            $this->specialist->update([
+                "cookie" => null
+            ]);
+
+
+        } else {
+            $this->bot->reply("Ошибка. Для удаления заказа необходимо написать: $confirm_text. С учетом регистра (без знаков).");
+        }
+
+        return true;
     }
 
 

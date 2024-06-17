@@ -78,9 +78,11 @@ class OrderSpecialistController extends Controller
         }
 
         if ($this->action == "chat_with") {
-
             $this->start_chat_with_user();
+        }
 
+        if ($this->action == "cancel_response") {
+            $this->cancel_response();
         }
     }
 
@@ -161,6 +163,17 @@ class OrderSpecialistController extends Controller
         $this->specialist->update([
             "cookie" => "chat_with_" . $this->chat_with . "|" . "order_id_" . $this->data,
         ]);
+    }
+
+    private function cancel_response()
+    {
+        $cookie = "cancel_response_" . $this->data;
+        $this->specialist->update([
+            "cookie" => $cookie
+        ]);
+
+        $this->bot->eventAnswerSnackbar("Для отмены предложения следуйте инструкции");
+        $this->bot->reply("Если вы хотите удалить предложение, напишите сообщение: 'Удалить отклик {$this->data}'");
     }
 
 }

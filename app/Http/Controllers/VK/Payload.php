@@ -3,11 +3,9 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
-
 use App\Models\Order;
 use App\Models\User;
 use DigitalStars\SimpleVK\SimpleVK;
-use DigitalStars\SimpleVK\SimpleVkException;
 use Log;
 use Throwable;
 
@@ -71,11 +69,6 @@ class Payload extends Controller
         return $this->bot->reply("После клика на кнопку ничего не произошло");
 
     }
-
-
-
-
-
 
 
 }

@@ -68,7 +68,7 @@ class OrderController extends Controller
         // После клика на "Новый заказ" создаем заказ в статусе Черновик (draft)
         $this->order->createEmptyOrder($this->user);
 
-        $message = "Выберите направление заявки";
+        $message = "Выберите предмет";
         $this->bot->eventAnswerSnackbar("$message");
         $this->bot->msg("$message")->kbd($this->button->categories())->send();
     }
@@ -81,10 +81,9 @@ class OrderController extends Controller
     {
         $category_id = $this->data;
         $this->order->addCategory($this->user, $category_id);
-        $this->bot->reply($category_id);
-
 
         $message = "Выберите с чем нужна помощь";
+        $this->bot->eventAnswerSnackbar("$message");
         $this->bot->msg("$message")->kbd($this->button->subjects($category_id))->send();
     }
 
@@ -97,7 +96,8 @@ class OrderController extends Controller
         $subject_id = $this->data;
         $this->order->addSubject($this->user, $subject_id);
 
-        $message = "Выберите с чем нужна помощь";
+        $message = "Выберите категорию работы";
+        $this->bot->eventAnswerSnackbar("$message");
         $this->bot->msg("$message")->kbd($this->button->whatYouNeedHelpWith())->send();
     }
 
@@ -112,6 +112,7 @@ class OrderController extends Controller
         $this->order->addWhatYouNeedHelpWith($this->user, $need_help_with);
 
         $message = "Укажите требуемые сроки";
+        $this->bot->eventAnswerSnackbar("Укажите сроки исполнения");
         $this->bot->msg("$message")->kbd($this->button->deadlines())->send();
     }
 
@@ -136,6 +137,7 @@ class OrderController extends Controller
 
         // Вывести информацию о заказе
         $order_info = $order->getInfoByOrderId($order->id);
+        $this->bot->eventAnswerSnackbar("Информация о вашем заказе");
         $this->bot->msg("$order_info")->kbd($this->button->publishOrder())->send();
     }
 
@@ -235,7 +237,7 @@ class OrderController extends Controller
      */
     private function myOrders(): void
     {
-        if (Order::where("user_id", $this->user->id)->count() == 0) {
+        if (Order::where(["user_id" => $this->user->id])->count() == 0) {
             $message = "У вас не найдено заказов";
         } else {
             $message = "Выберите заказ";
@@ -300,9 +302,9 @@ class OrderController extends Controller
         if ($this->action == "accept_offer") {
             $this->bot->eventAnswerSnackbar("Необходимо оплатить заказ");
 
-            $response = Response::where("order_id", $this->data)->firstOrFail();
+            $response = Response::where(["order_id" => $this->data])->firstOrFail();
             $yookassa = new YooKassa();
-            if ($payment = $yookassa->create(amount: $response->price, order_id: $response->order_id)){
+            if ($payment = $yookassa->create(amount: $response->price, order_id: $response->order_id)) {
                 $this->bot->reply("Для оплаты заказа перейдите по ссылке: $payment");
             }
 

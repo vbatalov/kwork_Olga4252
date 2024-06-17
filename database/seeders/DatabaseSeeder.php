@@ -81,6 +81,10 @@ class DatabaseSeeder extends Seeder
                         "description" => "Описание предмета",
                     ],
                     [
+                        "name" => "Геология",
+                        "description" => "Описание предмета",
+                    ],
+                    [
                         "name" => "Нанотехнологии",
                         "description" => "Описание предмета",
                     ],
@@ -118,6 +122,10 @@ class DatabaseSeeder extends Seeder
                     ],
                     [
                         "name" => "Физическая химия",
+                        "description" => "Описание предмета",
+                    ],
+                    [
+                        "name" => "Кристаллография",
                         "description" => "Описание предмета",
                     ],
                     [
