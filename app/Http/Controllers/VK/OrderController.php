@@ -156,6 +156,8 @@ class OrderController extends Controller
         $this->bot->msg("Ваша заявка (№ $order_id) опубликована, ожидайте ответа помощников.")
             ->kbd($this->button->mainMenuButton())
             ->send();
+
+        $this->sendNotificationToSpecialists($order_id);
     }
 
 
@@ -248,7 +250,7 @@ class OrderController extends Controller
 
     /**
      * Показать информацию о заказе
-     * @throws SimpleVkException
+     * @throws SimpleVkException|Throwable
      */
     private function _viewOrder(): void
     {
@@ -313,6 +315,11 @@ class OrderController extends Controller
             Log::add(user_id: $this->user->id, action: "Предложение исполнителя принято", class: Order::class, action_id: $this->data);
         }
 
+
+    }
+
+    private function sendNotificationToSpecialists(mixed $order_id)
+    {
 
     }
 
