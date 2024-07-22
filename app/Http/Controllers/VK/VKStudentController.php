@@ -28,7 +28,7 @@ class VKStudentController extends Controller
         $this->bot = vk::create("$token", "5.199");
         $this->bot->setConfirm($this->confirm);
 
-        $this->bot->setUserLogError("120637023");
+//        $this->bot->setUserLogError("120637023");
     }
 
     public function diagnostics()
