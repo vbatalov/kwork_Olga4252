@@ -25,6 +25,7 @@ class OrderController extends Controller
     public Buttons $button;
 
     public Order $order;
+    private array $payload;
 
     public function __construct(SimpleVK $bot, User $user, array $payload)
     {
@@ -34,6 +35,8 @@ class OrderController extends Controller
         $this->action = $payload['action'] ?? "null";
         $this->data = $payload['data'] ?? "null";
         $this->chat_with = $payload['chat_with'] ?? "null";
+
+        $this->payload = $payload;
 
         $this->order = new Order();
         $this->button = new Buttons();
@@ -174,6 +177,8 @@ class OrderController extends Controller
         // Пользователь выбрал категорию (save) -> Показать ему предметы
         if ($this->action == "newOrderSaveCategoryAndShowSubject") {
             $this->newOrderSaveCategoryAndShowSubject();
+        } elseif ($this->action == "show_next_page_subjects") {
+            $this->show_next_page_subjects();
         }
 
         // Пользователь выбрал предмет (save) -> Показать ему список с чем нужно помочь
@@ -321,6 +326,16 @@ class OrderController extends Controller
     private function sendNotificationToSpecialists(mixed $order_id)
     {
 
+    }
+
+    private function show_next_page_subjects()
+    {
+        $category_id = $this->payload['category_id'];
+        $page = $this->payload['page'];
+
+        $message = "Просмотр следующей страницы";
+        $this->bot->eventAnswerSnackbar("$message");
+        $this->bot->msg("$message")->kbd($this->button->subjects($category_id, $page))->send();
     }
 
 }

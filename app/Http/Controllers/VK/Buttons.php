@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers\VK;
 
+use App\Http\Controllers\Api\VK\SubjectController;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Order;
-use App\Models\Specialist;
-use App\Models\Subject;
 use App\Models\User;
 
 class Buttons extends Controller
@@ -90,11 +89,26 @@ class Buttons extends Controller
     }
 
     /** Меню предметов в категории */
-    public function subjects(int $id)
+    public function subjects(int $category_id, $page = 1)
     {
-        $items = Subject::where("category_id", $id)->get()->all();
-        $buttons = [];
+        $items = SubjectController::getSubject(category_id: $category_id, page: $page, perPage: 6);
+        $nav_buttons = [];
+        if (!$items->onFirstPage()) {
+            $nav_buttons [] = $this->vk->bot->buttonCallback("<", 'white', [
+                'action' => "show_next_page_subjects",
+                'category_id' => $category_id,
+                'page' => $page - 1,
+            ]);
+        }
+        if ($items->hasMorePages()) {
+            $nav_buttons [] = $this->vk->bot->buttonCallback(">", 'white', [
+                'action' => "show_next_page_subjects",
+                'category_id' => $category_id,
+                'page' => $page + 1,
+            ]);
+        }
 
+        $buttons = [];
         foreach ($items as $item) {
             $name_filter = mb_strimwidth($item->name, 0, 40);
             $buttons[] = $this->vk->bot->buttonCallback($name_filter, 'blue', [
@@ -104,6 +118,9 @@ class Buttons extends Controller
         }
 
         $chunk = array_chunk($buttons, 2);
+        if (isset($nav_buttons)) {
+            $chunk [] = $nav_buttons;
+        }
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;
     }
