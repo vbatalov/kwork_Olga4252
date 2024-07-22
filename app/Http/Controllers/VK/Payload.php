@@ -59,6 +59,7 @@ class Payload extends Controller
                 }
             }
 
+            return true;
 
         } catch (Throwable $e) {
             Log::error($e->getMessage());
