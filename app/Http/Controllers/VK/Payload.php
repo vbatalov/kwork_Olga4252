@@ -59,16 +59,18 @@ class Payload extends Controller
                 }
             }
 
-            return true;
 
         } catch (Throwable $e) {
             Log::error($e->getMessage());
         }
 
 
-        $this->bot->eventAnswerSnackbar("После клика на кнопку ничего не произошло");
-        return $this->bot->reply("После клика на кнопку ничего не произошло");
-
+        try {
+            $this->bot->eventAnswerSnackbar("После клика на кнопку ничего не произошло");
+            return $this->bot->reply("После клика на кнопку ничего не произошло");
+        } catch (Throwable) {
+        }
+        return true;
     }
 
 
