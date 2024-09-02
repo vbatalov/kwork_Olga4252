@@ -13,8 +13,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
-
-Route::get("ip", [\App\Http\Controllers\Controller::class, "ip"]);
+Route::get("/{patchMatch}", function () {
+    return view("admin.layout");
+})->where('patchMatch', '.*');

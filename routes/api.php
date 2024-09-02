@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\AdminApiController;
 use App\Http\Controllers\VK\VKSpecialistController;
 use App\Http\Controllers\VK\VKStudentController;
 use Illuminate\Http\Request;
@@ -18,6 +19,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::prefix("admin")->group(function () {
+    Route::controller(AdminApiController::class)->group(function () {
+        Route::post("getStats", "getStats")->name("getStats");
+        Route::get("getUsers", "getUsers")->name("getUsers");
+        Route::get("getOrders", "getOrders")->name("getOrders");
+    });
 });
 
 Route::controller(VKStudentController::class)->group(function () {
