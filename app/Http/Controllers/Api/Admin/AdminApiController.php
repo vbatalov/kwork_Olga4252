@@ -55,11 +55,11 @@ class AdminApiController extends Controller
             "category" => CategoryResource::make(Category::find($category_id)),
             "subjects" => SubjectResource::collection(Subject::where([
                 "category_id" => $category_id
-            ])->get())
+            ])->orderBy("sort")->get())
         ];
     }
 
-    public function saveCategory(Request $request)
+    public function updateOrCreateCategory(Request $request)
     {
 
         $category = Category::find($request->input("category_id"));
@@ -68,14 +68,63 @@ class AdminApiController extends Controller
             $category->update([
                 "name" => $request->input("category_name")
             ]);
+            return response()->json([
+                "status" => "updated"
+            ]);
         } else {
             Category::create([
                 "name" => $request->input("category_name")
             ]);
+            return response()->json([
+                "status" => "created"
+            ], 201);
         }
+    }
+
+    public function createSubject(Request $request)
+    {
+
+        $category_id = $request->input("category_id");
+        $name = $request->input("name");
+
+        Subject::create([
+            "name" => $name,
+            "category_id" => $category_id
+        ]);
 
         return response()->json([
-            "status" => "ok"
-        ]);
+            "status" => "created"
+        ], 201);
+
     }
+
+    public function updateSubject(Request $request)
+    {
+        $subject_id = $request->input("subject_id");
+        $name = $request->input("name");
+        $sort = $request->integer("sort");
+
+        Subject::find($subject_id)->update([
+            "name" => $name,
+            "sort" => $sort
+        ]);
+
+        return response()->json([
+            "status" => "updated"
+        ], 200);
+
+    }
+
+    public function deleteSubject(Request $request)
+    {
+        $id = $request->input("subject_id");
+
+        Subject::find($id)->delete();
+
+        return response()->json([
+            "status" => "deleted"
+        ], 200);
+
+    }
+
 }

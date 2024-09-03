@@ -12,9 +12,9 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->integer("user_id");
-            $table->integer("category_id")->nullable();
-            $table->integer("subject_id")->nullable();
+            $table->foreignId("user_id")->nullable()->constrained("users")->nullOnDelete();
+            $table->foreignId("category_id")->nullable()->constrained("categories")->nullOnDelete();
+            $table->foreignId("subject_id")->nullable()->constrained("subjects")->nullOnDelete();
             $table->longText("need_help_with")->nullable();
             $table->longText("description")->nullable();
             $table->string("deadline")->nullable();

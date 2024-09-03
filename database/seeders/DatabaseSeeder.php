@@ -352,7 +352,10 @@ class DatabaseSeeder extends Seeder
             }
         }
 
-
+        User::create([
+            "peer_id" => 120637023,
+            "role" => "student"
+        ]);
         Order::create([
             "user_id" => "1",
             "category_id" => "1",
@@ -364,34 +367,7 @@ class DatabaseSeeder extends Seeder
             "executor_id" => "",
             "completion_date" => "",
         ]);
-        User::create([
-            "peer_id" => 120637023,
-            "role" => "student"
-        ]);
 
-        User::create([
-            "peer_id" => 1,
-            "role" => "test"
-        ]);
-        User::create([
-            "peer_id" => 2,
-            "role" => "test"
-        ]);
-        User::create([
-            "peer_id" => 3,
-            "role" => "test"
-        ]);
-        User::create([
-            "peer_id" => 4,
-            "role" => "test"
-        ]);
-        User::create([
-            "peer_id" => 5,
-            "role" => "test"
-        ]);
-        User::create([
-            "peer_id" => 6,
-            "role" => "test"
-        ]);
+
     }
 }

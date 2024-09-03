@@ -25,8 +25,8 @@ class OrderResource extends JsonResource
         return [
             "id" => $this->id,
             "user" => User::find($this->user_id),
-            "category" => Category::find($this->category_id)->name,
-            "subject" => Subject::find($this->subject_id)->name,
+            "category" => Category::find($this->category_id)->name ?? "NULL",
+            "subject" => Subject::find($this->subject_id)->name ?? "NULL",
             "need_help_with" => $this->need_help_with,
             "description" => $this->description,
             "deadline" => $this->deadline,

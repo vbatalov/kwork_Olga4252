@@ -29,7 +29,10 @@ Route::prefix("admin")->group(function () {
         Route::get("categories", "getCategories")->name("getCategories");
         Route::get("category", "getCategory")->name("get-category");
 
-        Route::put("category", "saveCategory")->name("save-category");
+        Route::put("category", "updateOrCreateCategory")->name("save-category");
+        Route::put("createSubject", "createSubject")->name("createSubject");
+        Route::put("updateSubject", "updateSubject")->name("updateSubject");
+        Route::delete("deleteSubject", "deleteSubject")->name("deleteSubject");
     });
 });
 

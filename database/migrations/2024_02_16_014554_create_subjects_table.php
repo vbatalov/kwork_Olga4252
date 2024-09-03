@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('subjects', function (Blueprint $table) {
             $table->id();
-            $table->integer("category_id");
+            $table->foreignId("category_id")->nullable()->constrained("categories")->nullOnDelete();
             $table->string("name");
             $table->string("description")->nullable();
+            $table->integer("sort")->default(100);
             $table->timestamps();
         });
     }

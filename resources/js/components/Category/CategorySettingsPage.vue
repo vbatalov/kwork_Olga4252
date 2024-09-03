@@ -6,18 +6,24 @@ import {BarsArrowUpIcon, ChevronDownIcon, DocumentTextIcon} from '@heroicons/vue
 
 import Toast from 'primevue/toast';
 import ToastService from 'primevue/toastservice';
-import { useToast } from 'primevue/usetoast';
+import {useToast} from 'primevue/usetoast';
+import Dialog from 'primevue/dialog';
 
 export default {
     created() {
-        this.showCategory(router.currentRoute.value.params.id)
+        this.category_id = router.currentRoute.value.params.id;
+        this.showCategory(this.category_id)
     },
     data() {
         return {
             category: null,
+            category_id: null,
             subjects: null,
             isOpen: false,
             category_name: null,
+            toast: useToast(),
+            modal_add_category_visible: false,
+            new_subject_name: null,
         }
     },
     methods: {
@@ -37,7 +43,64 @@ export default {
                     "category_id": category_id,
                     "category_name": this.category_name,
                 })).then(r => {
+                    this.toast.add({
+                        severity: 'success',
+                        summary: 'Успешно',
+                        detail: 'Категория сохранена',
+                        life: 3000
+                    });
+                });
+            });
+        },
 
+        saveSubject() {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.put(route("createSubject", {
+                    "category_id": this.category_id,
+                    "name": this.new_subject_name,
+                })).then(r => {
+                    this.toast.add({
+                        severity: 'success',
+                        summary: 'Успешно',
+                        detail: 'Предмет добавлен',
+                        life: 3000
+                    });
+                    this.modal_add_category_visible = false;
+                    this.showCategory(this.category_id);
+                });
+            });
+        },
+        updateSubject(subject_id, subject_name, sort) {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.put(route("updateSubject", {
+                    "subject_id": subject_id,
+                    "name": subject_name,
+                    "sort": sort,
+                })).then(r => {
+                    this.toast.add({
+                        severity: 'success',
+                        summary: 'Успешно',
+                        detail: 'Предмет обновлен',
+                        life: 3000
+                    });
+
+                    this.showCategory(this.category_id);
+                });
+            });
+        },
+        deleteSubject(subject_id) {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.delete(route("deleteSubject", {
+                    "subject_id": subject_id,
+                })).then(r => {
+                    this.toast.add({
+                        severity: 'success',
+                        summary: 'Успешно',
+                        detail: 'Предмет удален',
+                        life: 3000
+                    });
+
+                    this.showCategory(this.category_id);
                 });
             });
         }
@@ -45,14 +108,33 @@ export default {
     components: {
         Menu, MenuButton, MenuItems, MenuItem, ChevronDownIcon,
         BarsArrowUpIcon, DocumentTextIcon,
-        Toast, ToastService
+        Toast, ToastService,
+        Dialog
     }
 }
 </script>
 
 <template>
     <div>
-        <Toast/>
+        <div>
+            <Toast position="bottom-right"/>
+        </div>
+        <div>
+            <Dialog v-model:visible="modal_add_category_visible" modal header="Добавить предмет"
+                    :style="{ width: '25rem' }">
+                <div class="mb-4">
+                    <input type="text" v-model="new_subject_name"
+                           class="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-4 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                           placeholder="Укажите наименование"/>
+                </div>
+
+                <div class="flex justify-end gap-2">
+                    <button type="button" @click="saveSubject()">
+                        Добавить
+                    </button>
+                </div>
+            </Dialog>
+        </div>
 
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="sm:flex sm:items-center">
@@ -63,7 +145,7 @@ export default {
                     </p>
                 </div>
                 <div>
-                    <button type="button"
+                    <button type="button" @click="modal_add_category_visible = true"
                             class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
 
                         Добавить предмет
@@ -97,7 +179,7 @@ export default {
                             <tr>
                                 <th scope="col"
                                     class="py-3 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-0">
-                                    ID
+                                    Сортировка
                                 </th>
                                 <th scope="col"
                                     class=" w-full px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
@@ -113,7 +195,9 @@ export default {
                             <tbody class="divide-y divide-gray-200 ">
                             <tr v-for="subject in subjects">
                                 <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                                    {{ subject.id }}
+                                    <input type="text" v-model="subject.sort"
+                                           class="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                                           placeholder="Сортировка"/>
                                 </td>
                                 <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                     <input type="text" v-model="subject.name"
@@ -121,7 +205,7 @@ export default {
                                            placeholder="Укажите наименование"/>
                                 </td>
                                 <td>
-                                    <button type="button"
+                                    <button type="button" @click="updateSubject(subject.id, subject.name, subject.sort)"
                                             class="relative -ml-px inline-flex items-center gap-x-1.5 px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                                         <BarsArrowUpIcon class="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true"/>
                                         Сохранить
@@ -129,7 +213,7 @@ export default {
                                 </td>
 
                                 <td>
-                                    <button type="button"
+                                    <button type="button" @click="deleteSubject(subject.id)"
                                             class="relative -ml-px inline-flex items-center gap-x-1.5  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-red-50">
                                         <BarsArrowUpIcon class="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true"/>
                                         Удалить

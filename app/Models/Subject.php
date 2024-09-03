@@ -10,6 +10,7 @@ class Subject extends Model
         "category_id",
         "name",
         "description",
+        "sort",
     ];
 
 }
