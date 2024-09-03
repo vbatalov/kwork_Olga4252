@@ -58,4 +58,24 @@ class AdminApiController extends Controller
             ])->get())
         ];
     }
+
+    public function saveCategory(Request $request)
+    {
+
+        $category = Category::find($request->input("category_id"));
+
+        if ($category) {
+            $category->update([
+                "name" => $request->input("category_name")
+            ]);
+        } else {
+            Category::create([
+                "name" => $request->input("category_name")
+            ]);
+        }
+
+        return response()->json([
+            "status" => "ok"
+        ]);
+    }
 }

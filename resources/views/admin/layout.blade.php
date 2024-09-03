@@ -9,6 +9,7 @@
 </head>
 <body class="bg-gray-100">
 @routes
+
 <div id="app">
 
 </div>

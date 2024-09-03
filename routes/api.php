@@ -28,6 +28,8 @@ Route::prefix("admin")->group(function () {
         Route::get("orders", "getOrders")->name("getOrders");
         Route::get("categories", "getCategories")->name("getCategories");
         Route::get("category", "getCategory")->name("get-category");
+
+        Route::put("category", "saveCategory")->name("save-category");
     });
 });
 

@@ -4,6 +4,10 @@ import router from "../../router/index.js";
 import {Menu, MenuButton, MenuItem, MenuItems} from '@headlessui/vue'
 import {BarsArrowUpIcon, ChevronDownIcon, DocumentTextIcon} from '@heroicons/vue/20/solid'
 
+import Toast from 'primevue/toast';
+import ToastService from 'primevue/toastservice';
+import { useToast } from 'primevue/usetoast';
+
 export default {
     created() {
         this.showCategory(router.currentRoute.value.params.id)
@@ -26,16 +30,30 @@ export default {
                 });
             });
         },
+
+        saveCategory(category_id) {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.put(route("save-category", {
+                    "category_id": category_id,
+                    "category_name": this.category_name,
+                })).then(r => {
+
+                });
+            });
+        }
     },
     components: {
         Menu, MenuButton, MenuItems, MenuItem, ChevronDownIcon,
-        BarsArrowUpIcon, DocumentTextIcon
+        BarsArrowUpIcon, DocumentTextIcon,
+        Toast, ToastService
     }
 }
 </script>
 
 <template>
     <div>
+        <Toast/>
+
         <div class="px-4 sm:px-6 lg:px-8">
             <div class="sm:flex sm:items-center">
                 <div class="sm:flex-auto">
@@ -63,7 +81,7 @@ export default {
                                class="block w-full rounded-none rounded-l-md border-0 py-1.5 pl-10 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                                placeholder="Укажите наименование"/>
                     </div>
-                    <button type="button"
+                    <button type="button" @click="saveCategory(category.id)"
                             class="relative -ml-px inline-flex items-center gap-x-1.5 rounded-r-md px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
                         <BarsArrowUpIcon class="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true"/>
                         Сохранить
@@ -82,10 +100,12 @@ export default {
                                     ID
                                 </th>
                                 <th scope="col"
-                                    class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
+                                    class=" w-full px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
                                     Наименование
                                 </th>
 
+                                <th scope="col" class="relative py-3 pl-3 pr-4 sm:pr-0">
+                                </th>
                                 <th scope="col" class="relative py-3 pl-3 pr-4 sm:pr-0">
                                 </th>
                             </tr>
@@ -101,48 +121,21 @@ export default {
                                            placeholder="Укажите наименование"/>
                                 </td>
                                 <td>
-                                    <a href="#"
-                                       class="hover:bg-gray-50 text-gray-700 block px-4 py-2 text-sm">
-                                        Изменить
-                                    </a>
+                                    <button type="button"
+                                            class="relative -ml-px inline-flex items-center gap-x-1.5 px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
+                                        <BarsArrowUpIcon class="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true"/>
+                                        Сохранить
+                                    </button>
                                 </td>
-                                <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                    <Menu as="div" class="relative inline-block text-left">
-                                        <div>
-                                            <MenuButton
-                                                class="inline-flex w-full justify-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50">
-                                                Действие
-                                                <ChevronDownIcon class="-mr-1 h-5 w-5 text-gray-400"
-                                                                 aria-hidden="true"/>
-                                            </MenuButton>
-                                        </div>
 
-                                        <transition enter-active-class="transition ease-out duration-100"
-                                                    enter-from-class="transform opacity-0 scale-95"
-                                                    enter-to-class="transform opacity-100 scale-100"
-                                                    leave-active-class="transition ease-in duration-75"
-                                                    leave-from-class="transform opacity-100 scale-100"
-                                                    leave-to-class="transform opacity-0 scale-95">
-                                            <MenuItems
-                                                class="absolute right-0 z-10 mt-2 w-56 origin-top-right bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                                                <div class="">
-                                                    <MenuItem>
-                                                        <a href="#"
-                                                           class="hover:bg-gray-50 text-gray-700 block px-4 py-2 text-sm">
-                                                            Изменить
-                                                        </a>
-                                                    </MenuItem>
-                                                    <MenuItem>
-                                                        <a href="#"
-                                                           class="hover:bg-gray-50 text-gray-700 block px-4 py-2 text-sm">
-                                                            Удалить
-                                                        </a>
-                                                    </MenuItem>
-                                                </div>
-                                            </MenuItems>
-                                        </transition>
-                                    </Menu>
+                                <td>
+                                    <button type="button"
+                                            class="relative -ml-px inline-flex items-center gap-x-1.5  px-3 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-red-50">
+                                        <BarsArrowUpIcon class="-ml-0.5 h-5 w-5 text-gray-400" aria-hidden="true"/>
+                                        Удалить
+                                    </button>
                                 </td>
+
                             </tr>
                             </tbody>
                         </table>
