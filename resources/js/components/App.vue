@@ -123,21 +123,21 @@ import { ref } from 'vue'
 import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
 import {
     Bars3Icon,
-    CalendarIcon,
     ChartPieIcon,
-    DocumentDuplicateIcon,
+    CurrencyDollarIcon,
     FolderIcon,
     HomeIcon,
     UsersIcon,
     XMarkIcon,
+    CogIcon,
 } from '@heroicons/vue/24/outline'
 
 const navigation = [
     { name: 'Дашборд', href: '/', icon: HomeIcon, current: false },
     { name: 'Пользователи', href: '/users', icon: UsersIcon, current: false },
     { name: 'Заказы', href: '/orders', icon: FolderIcon, current: false },
-    { name: 'Calendar', href: '#', icon: CalendarIcon, current: false },
-    { name: 'Documents', href: '#', icon: DocumentDuplicateIcon, current: false },
+    { name: 'Категории', href: '/categories', icon: CogIcon, current: false },
+    { name: 'Финансы', href: '#', icon: CurrencyDollarIcon, current: false },
     { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
 ]
 

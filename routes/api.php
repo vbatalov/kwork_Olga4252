@@ -23,9 +23,11 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::prefix("admin")->group(function () {
     Route::controller(AdminApiController::class)->group(function () {
-        Route::post("getStats", "getStats")->name("getStats");
-        Route::get("getUsers", "getUsers")->name("getUsers");
-        Route::get("getOrders", "getOrders")->name("getOrders");
+        Route::post("stats", "getStats")->name("getStats");
+        Route::get("users", "getUsers")->name("getUsers");
+        Route::get("orders", "getOrders")->name("getOrders");
+        Route::get("categories", "getCategories")->name("getCategories");
+        Route::get("category", "getCategory")->name("get-category");
     });
 });
 

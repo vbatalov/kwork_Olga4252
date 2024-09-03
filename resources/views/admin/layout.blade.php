@@ -1,4 +1,4 @@
-<html class="h-full bg-white">
+<html class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -7,7 +7,7 @@
     <title>Admin</title>
     @vite(["resources/js/app.js", "resources/css/app.css"])
 </head>
-<body class="h-full bg-gray-100">
+<body class="bg-gray-100">
 @routes
 <div id="app">
 
