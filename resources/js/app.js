@@ -4,14 +4,14 @@ import App from './components/App.vue'
 import router from './router/index.js'
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
-import Lara from '@primevue/themes/lara';
+import Theme from '@primevue/themes/nora';
 
 
 const app = createApp(App);
 
 app.use(PrimeVue, {
     theme: {
-        preset: Lara
+        preset: Theme
     }
 })
     .use(ToastService)

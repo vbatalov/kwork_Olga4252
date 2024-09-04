@@ -38,7 +38,6 @@ export default {
             axios.get('/sanctum/csrf-cookie').then(response => {
                 axios.post(route("getStats")).then(r => {
                     this.stats = r.data
-                    console.log(this.stats);
                 });
             });
         },

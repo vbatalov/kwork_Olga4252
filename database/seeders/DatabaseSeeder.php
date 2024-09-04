@@ -4,9 +4,11 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Category;
+use App\Models\Message;
 use App\Models\Order;
 use App\Models\Subject;
 use App\Models\User;
+use Faker\Factory;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -366,6 +368,24 @@ class DatabaseSeeder extends Seeder
             "status" => "pending",
             "executor_id" => "",
             "completion_date" => "",
+        ]);
+
+        Message::create([
+            "from" => 1,
+            "sender" => "user",
+            "to" => 2,
+            "order_id" => 1,
+            "recipient" => "specialist",
+            "message" => Factory::create()->text()
+        ]);
+        sleep(1);
+        Message::create([
+            "from" => 1,
+            "sender" => "specialist",
+            "to" => 2,
+            "order_id" => 1,
+            "recipient" => "user",
+            "message" => Factory::create()->text()
         ]);
 
 

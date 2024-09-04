@@ -92,7 +92,7 @@
                                 {{ order.completion_date }}
                             </td>
                             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                <router-link to="#" class="text-indigo-600 hover:text-indigo-900">
+                                <router-link :to="'orders/'+order.id" class="text-indigo-600 hover:text-indigo-900">
                                     Подробнее
                                 </router-link>
                             </td>

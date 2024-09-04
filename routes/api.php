@@ -26,6 +26,7 @@ Route::prefix("admin")->group(function () {
         Route::post("stats", "getStats")->name("getStats");
         Route::get("users", "getUsers")->name("getUsers");
         Route::get("orders", "getOrders")->name("getOrders");
+        Route::get("order", "getOrder")->name("getOrderById");
         Route::get("categories", "getCategories")->name("getCategories");
         Route::get("category", "getCategory")->name("get-category");
 

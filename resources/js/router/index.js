@@ -1,6 +1,7 @@
 import HomePage from "../components/HomePage.vue";
 import LoginPage from "../components/LoginPage.vue";
 import OrdersPage from "../components/Order/OrdersPage.vue";
+import OrderDetailPage from "../components/Order/OrderDetailPage.vue";
 import UsersPage from "../components/UsersPage.vue";
 import CategoriesPage from "../components/Category/CategoriesPage.vue";
 import CategorySettingsPage from '../components/Category/CategorySettingsPage.vue'
@@ -24,6 +25,10 @@ const routes = [
     {
         path: '/orders',
         component: OrdersPage,
+    },
+    {
+        path: '/orders/:id',
+        component: OrderDetailPage,
     },
     {
         path: '/categories',

@@ -1,6 +1,5 @@
 <script>
 import axios from "axios";
-import router from "../../router/index.js";
 import {Menu, MenuButton, MenuItem, MenuItems} from '@headlessui/vue'
 import {BarsArrowUpIcon, ChevronDownIcon, DocumentTextIcon} from '@heroicons/vue/20/solid'
 
@@ -11,7 +10,7 @@ import Dialog from 'primevue/dialog';
 
 export default {
     created() {
-        this.category_id = router.currentRoute.value.params.id;
+        this.category_id = this.$route.params.id;
         this.showCategory(this.category_id)
     },
     data() {
