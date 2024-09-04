@@ -51,7 +51,7 @@ export default {
 </script>
 
 <template>
-    <div class="px-4 sm:px-6 lg:px-8">
+    <div class="p-4 sm:px-6 lg:px-8 bg-white">
         <div class="sm:flex sm:items-center">
             <div class="sm:flex-auto">
                 <h1 class="text-base font-semibold leading-6 text-gray-900">
@@ -64,101 +64,102 @@ export default {
         </div>
 
 
-        <div class="grid grid-cols-1 lg:grid-cols-1">
+        <div class=" mt-6 border-t border-gray-100" v-if="data != null">
+            <dl class="divide-y divide-gray-100">
 
-            <div class="col-span-2 mt-6 border-t border-gray-100" v-if="data != null">
-                <dl class="divide-y divide-gray-100">
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        Статус заказа
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.status }}
+                    </dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        Категория
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.category }}
+                    </dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        Предмет
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.subject }}
+                    </dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        Необходима помощь
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.need_help_with }}
+                    </dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        Описание заказчика
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.description }}
+                    </dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        Дата создания
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.created_at }}
+                    </dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        Deadline
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.deadline }}
+                    </dd>
+                </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">
+                        ID исполнителя
+                    </dt>
+                    <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                        {{ data.order.executor_id }}
+                    </dd>
+                </div>
 
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            Статус заказа
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.status }}
-                        </dd>
-                    </div>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            Категория
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.category }}
-                        </dd>
-                    </div>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            Предмет
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.subject }}
-                        </dd>
-                    </div>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            Необходима помощь
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.need_help_with }}
-                        </dd>
-                    </div>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            Описание заказчика
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.description }}
-                        </dd>
-                    </div>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            Дата создания
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.created_at }}
-                        </dd>
-                    </div>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            Deadline
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.deadline }}
-                        </dd>
-                    </div>
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">
-                            ID исполнителя
-                        </dt>
-                        <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                            {{ data.order.executor_id }}
-                        </dd>
-                    </div>
-
-                    <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt class="text-sm font-medium leading-6 text-gray-900">Вложения</dt>
-                        <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
-                            <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
-                                <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
-                                    <div class="flex w-0 flex-1 items-center">
-                                        <PaperClipIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true"/>
-                                        <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                                            <span class="truncate font-medium">resume_back_end_developer.pdf</span>
-                                            <span class="flex-shrink-0 text-gray-400">2.4mb</span>
-                                        </div>
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+                    <dt class="text-sm font-medium leading-6 text-gray-900">Вложения</dt>
+                    <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+                        <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
+                            <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
+                                <div class="flex w-0 flex-1 items-center">
+                                    <PaperClipIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true"/>
+                                    <div class="ml-4 flex min-w-0 flex-1 gap-2">
+                                        <span class="truncate font-medium">resume_back_end_developer.pdf</span>
+                                        <span class="flex-shrink-0 text-gray-400">2.4mb</span>
                                     </div>
-                                    <div class="ml-4 flex-shrink-0">
-                                        <a href="#"
-                                           class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
-                                    </div>
-                                </li>
-                            </ul>
-                        </dd>
-                    </div>
-                </dl>
-            </div>
+                                </div>
+                                <div class="ml-4 flex-shrink-0">
+                                    <a href="#"
+                                       class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
+                                </div>
+                            </li>
+                        </ul>
+                    </dd>
+                </div>
+            </dl>
+        </div>
 
-
-            <ul role="list" class="space-y-6" v-if="data != null">
+        <div v-if="data != null">
+            <p class="font-bold text-lg mb-4">
+                Сообщения между пользователями
+            </p>
+            <ul role="list" class="space-y-6" >
 
                 <li v-for="item in data.messages" class="relative flex gap-x-4">
                     <div
@@ -176,7 +177,7 @@ export default {
                                 написал
                             </div>
                             <time
-                                  class="flex-none py-0.5 text-xs leading-5 text-gray-500">
+                                class="flex-none py-0.5 text-xs leading-5 text-gray-500">
                                 {{ item.diff }}
                             </time>
                         </div>
@@ -186,7 +187,6 @@ export default {
                     </div>
                 </li>
             </ul>
-
         </div>
 
 
