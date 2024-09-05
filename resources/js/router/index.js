@@ -2,7 +2,9 @@ import HomePage from "../components/HomePage.vue";
 import LoginPage from "../components/LoginPage.vue";
 import OrdersPage from "../components/Order/OrdersPage.vue";
 import OrderDetailPage from "../components/Order/OrderDetailPage.vue";
-import UsersPage from "../components/UsersPage.vue";
+import UsersPage from "../components/User/UsersPage.vue";
+import UserDetailPage from "../components/User/UserDeatilPage.vue";
+import UserLogsPage from "../components/User/UserLogsPage.vue";
 import CategoriesPage from "../components/Category/CategoriesPage.vue";
 import CategorySettingsPage from '../components/Category/CategorySettingsPage.vue'
 import NotFoundPage from "../components/NotFoundPage.vue";
@@ -21,6 +23,14 @@ const routes = [
     {
         path: '/users',
         component: UsersPage,
+    },
+    {
+        path: '/users/:id',
+        component: UserDetailPage,
+    },
+    {
+        path: '/users/:id/logs',
+        component: UserLogsPage,
     },
     {
         path: '/orders',

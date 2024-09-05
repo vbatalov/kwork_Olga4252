@@ -1,18 +1,63 @@
+<script>
+import axios from "axios";
+import {PaperClipIcon} from '@heroicons/vue/20/solid'
+import {CheckCircleIcon} from '@heroicons/vue/24/solid'
+
+export default {
+    created() {
+        this.user_id = this.$route.params.id;
+        this.getUser();
+    },
+    data() {
+        return {
+            user_id: null,
+            data: null,
+
+            activity: [
+                {id: 1, type: 'created', person: {name: 'Chelsea Hagon'}, date: '7d ago', dateTime: '2023-01-23T10:32'},
+                {id: 2, type: 'edited', person: {name: 'Chelsea Hagon'}, date: '6d ago', dateTime: '2023-01-23T11:03'},
+                {id: 3, type: 'sent', person: {name: 'Chelsea Hagon'}, date: '6d ago', dateTime: '2023-01-23T11:24'},
+                {
+                    id: 4,
+                    type: 'commented',
+                    person: {
+                        name: 'Chelsea Hagon',
+                        imageUrl:
+                            'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
+                    },
+                    comment: 'Called client, they reassured me the invoice would be paid by the 25th.',
+                    date: '3d ago',
+                    dateTime: '2023-01-23T15:56',
+                },
+                {id: 5, type: 'viewed', person: {name: 'Alex Curren'}, date: '2d ago', dateTime: '2023-01-24T09:12'},
+                {id: 6, type: 'paid', person: {name: 'Alex Curren'}, date: '1d ago', dateTime: '2023-01-24T09:20'},
+            ]
+
+        }
+    },
+    methods: {
+        getUser() {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.get(route("getUserLogs", {'user_id': this.user_id})).then(r => {
+                    this.data = r.data.data;
+                });
+            });
+        }
+    },
+    components: {
+        PaperClipIcon, CheckCircleIcon
+    }
+}
+</script>
+
 <template>
     <div class="px-4 sm:px-6 lg:px-8">
         <div class="sm:flex sm:items-center">
             <div class="sm:flex-auto">
-                <h1 class="text-base font-semibold leading-6 text-gray-900">Пользователи</h1>
-                <p class="mt-2 text-sm text-gray-700">
-                    Список пользователей бота
-                </p>
+                <h1 class="text-base font-semibold leading-6 text-gray-900">Просмотр действий пользователя {{user_id}}</h1>
+
             </div>
-            <div class="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
-                <button type="button"
-                        class="block rounded-md bg-indigo-600 px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                    Add user
-                </button>
-            </div>
+
         </div>
         <div class="mt-8 flow-root" v-if="users != null">
             <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -49,7 +94,7 @@
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.surname }}</td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.created_at }}</td>
                             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                <router-link to="#" class="text-indigo-600 hover:text-indigo-900">
+                                <router-link :to="'users/'+user.id" class="text-indigo-600 hover:text-indigo-900">
                                     Подробнее
                                 </router-link>
                             </td>
@@ -86,43 +131,5 @@
     </div>
 
 </template>
-<script>
-import axios from "axios";
-import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
 
-export default {
-    mounted() {
-        this.getUsers();
-    },
-    data() {
-        return {
-            users: null,
-            links: null,
-            page: 1
-        }
-    },
-    methods: {
-        getUsers() {
-            axios.get('/sanctum/csrf-cookie').then(() => {
-                axios.get(route("getUsers", {'page': this.page})).then(r => {
-                    this.users = r.data.data;
-                    this.links = r.data.links;
-                });
-            });
-        },
-        nextPage() {
-            this.page = this.page + 1;
-            this.users = null;
-            this.getUsers()
-        },
-        prevPage() {
-            this.page = this.page - 1;
-            this.users = null;
-            this.getUsers()
-        }
-    },
-    components: {ChevronLeftIcon, ChevronRightIcon},
-}
-
-</script>
 

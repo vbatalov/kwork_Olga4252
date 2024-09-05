@@ -10,6 +10,7 @@ use App\Http\Resources\SubjectResource;
 use App\Http\Resources\UserResource;
 use App\Models\Attachment;
 use App\Models\Category;
+use App\Models\Log;
 use App\Models\Message;
 use App\Models\Order;
 use App\Models\Subject;
@@ -36,9 +37,17 @@ class AdminApiController extends Controller
         ];
     }
 
-    public function getUsers()
+    public function getUsers(Request $request)
     {
+        if ($request->has("user_id")) {
+            return UserResource::make(User::find($request->get("user_id")));
+        }
+
         return UserResource::collection(User::paginate(10));
+    }
+    public function getUserLogs(Request $request)
+    {
+        return Log::whereUserId($request->get("user_id"))->get();
     }
 
     public function getOrders()
