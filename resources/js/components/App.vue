@@ -138,8 +138,8 @@ const navigation = [
     { name: 'Пользователи', href: '/users', icon: UsersIcon, current: false },
     { name: 'Заказы', href: '/orders', icon: FolderIcon, current: false },
     { name: 'Категории', href: '/categories', icon: CogIcon, current: false },
-    { name: 'Финансы', href: '#', icon: CurrencyDollarIcon, current: false },
-    { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
+    // { name: 'Финансы', href: '#', icon: CurrencyDollarIcon, current: false },
+    // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
 ]
 
 const sidebarOpen = ref(false)
