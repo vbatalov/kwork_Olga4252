@@ -7,6 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class SpecialistFavoriteSubject extends Model
 {
+
+    /**
+     *  Модель не используется. Вероятно это избранный предмет специалиста.
+     */
+
     protected $fillable =
         [
             "user_id",
