@@ -71,7 +71,7 @@ class OrderController extends Controller
         // После клика на "Новый заказ" создаем заказ в статусе Черновик (draft)
         $this->order->createEmptyOrder($this->user);
 
-        $message = "Выберите предмет";
+        $message = "Выберите предмет:";
         $this->bot->eventAnswerSnackbar("$message");
         $this->bot->msg("$message")->kbd($this->button->categories())->send();
     }
