@@ -49,7 +49,7 @@
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                 <div class="flex">
                                     <InputText type="text" class="w-16 text-center" v-model="user.percent"/>
-                                    <Button @click="savePercent(user.id, user.percent)" label="" icon="pi pi-check" iconPos="right"/>
+                                    <Button @click="savePercent(user.id, user.percent)" label="" icon="pi pi-check"/>
                                 </div>
                             </td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.created_at }}</td>
