@@ -34,6 +34,7 @@ Route::prefix("admin")->group(function () {
         Route::get("specialist-categories", "getSpecialistCategories")->name("getSpecialistCategories");
 
         Route::put("specialist-categories", "updateSpecialistCategories")->name("updateSpecialistCategories");
+        Route::patch("specialist-percent", "updateSpecialistPercent")->name("updateSpecialistPercent");
         Route::put("category", "updateOrCreateCategory")->name("save-category");
         Route::put("createSubject", "createSubject")->name("createSubject");
         Route::put("updateSubject", "updateSubject")->name("updateSubject");

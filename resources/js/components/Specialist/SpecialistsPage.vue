@@ -46,10 +46,16 @@
                             </td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.name }}</td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.surname }}</td>
-                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.percent }}</td>
+                            <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                <div class="flex">
+                                    <InputText type="text" class="w-16 text-center" v-model="user.percent"/>
+                                    <Button @click="savePercent(user.id, user.percent)" label="" icon="pi pi-check" iconPos="right"/>
+                                </div>
+                            </td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.created_at }}</td>
                             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                <Button :raised="true" class="text-xs" label="Изменить" @click="getSpecialistCategories(user.id)"/>
+                                <Button :raised="true" class="text-xs" label="Категории"
+                                        @click="getSpecialistCategories(user.id)"/>
                             </td>
                         </tr>
                         </tbody>
@@ -60,7 +66,7 @@
                 <Dialog v-model:visible="modal_visible" modal header="Управление специалистом"
                         :style="{ width: '30rem' }"
                         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                    <div class="mb-8">
+                    <div class="">
                         <div class="card flex justify-start">
                             <div class="flex flex-col gap-4">
                                 <div v-for="category of categories" :key="category.id" class="flex items-center">
@@ -71,9 +77,9 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div>
-                        <Button @click="saveCategories()">Сохранить категории</Button>
+                        <div class="my-4">
+                            <Button @click="saveCategories()">Сохранить категории</Button>
+                        </div>
                     </div>
                 </Dialog>
             </div>
@@ -116,6 +122,8 @@ import Dialog from 'primevue/dialog';
 import Button from "primevue/button";
 import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
 import Checkbox from 'primevue/checkbox';
+import InputText from 'primevue/inputtext';
+import 'primeicons/primeicons.css'
 
 
 export default {
@@ -147,6 +155,14 @@ export default {
                         // alert('Ошибка сохранения');
                     }
                 );
+            });
+        },
+        savePercent(id, percent) {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.patch(route("updateSpecialistPercent", {
+                    'id': id,
+                    'percent': percent,
+                }));
             });
         },
         getSpecialists() {
@@ -184,7 +200,7 @@ export default {
             this.getSpecialists()
         }
     },
-    components: {ChevronLeftIcon, ChevronRightIcon, Dialog, Button, Checkbox},
+    components: {ChevronLeftIcon, ChevronRightIcon, Dialog, Button, Checkbox, InputText},
 }
 
 </script>

@@ -195,5 +195,13 @@ class AdminApiController extends Controller
         return $array;
     }
 
+    public function updateSpecialistPercent(Request $request)
+    {
+        Specialist::findOrFail($request->input("id"))
+            ->update([
+                "percent" => $request->input("percent")
+            ]);
+    }
+
 
 }
