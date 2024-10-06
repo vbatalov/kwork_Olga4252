@@ -70,6 +70,14 @@ class AdminApiController extends Controller
         ];
     }
 
+    public function updateOrder(Request $request)
+    {
+        Order::where(["id" => $request->input('id')])
+            ->update([
+                "description" => $request->input("description")
+            ]);
+    }
+
     public function getCategories()
     {
         return CategoryResource::collection(Category::all());

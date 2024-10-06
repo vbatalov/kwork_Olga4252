@@ -26,16 +26,20 @@ Route::prefix("admin")->group(function () {
         Route::post("stats", "getStats")->name("getStats");
         Route::get("users", "getUsers")->name("getUsers");
         Route::get("user_logs", "getUserLogs")->name("getUserLogs");
+
         Route::get("orders", "getOrders")->name("getOrders");
         Route::get("order", "getOrder")->name("getOrderById");
+        Route::patch("order", "updateOrder")->name("updateOrder");
+
         Route::get("categories", "getCategories")->name("getCategories");
         Route::get("category", "getCategory")->name("get-category");
+        Route::put("category", "updateOrCreateCategory")->name("save-category");
+
         Route::get("specialists", "getSpecialists")->name("getSpecialists");
         Route::get("specialist-categories", "getSpecialistCategories")->name("getSpecialistCategories");
-
         Route::put("specialist-categories", "updateSpecialistCategories")->name("updateSpecialistCategories");
         Route::patch("specialist-percent", "updateSpecialistPercent")->name("updateSpecialistPercent");
-        Route::put("category", "updateOrCreateCategory")->name("save-category");
+
         Route::put("createSubject", "createSubject")->name("createSubject");
         Route::put("updateSubject", "updateSubject")->name("updateSubject");
         Route::delete("deleteSubject", "deleteSubject")->name("deleteSubject");

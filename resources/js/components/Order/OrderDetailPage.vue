@@ -2,6 +2,9 @@
 import axios from "axios";
 import {PaperClipIcon} from '@heroicons/vue/20/solid'
 import {CheckCircleIcon} from '@heroicons/vue/24/solid'
+import InputText from "primevue/inputtext";
+import Button from "primevue/button";
+import Textarea from "primevue/textarea";
 
 export default {
     created() {
@@ -12,30 +15,18 @@ export default {
         return {
             order_id: null,
             data: null,
-
-            activity: [
-                {id: 1, type: 'created', person: {name: 'Chelsea Hagon'}, date: '7d ago', dateTime: '2023-01-23T10:32'},
-                {id: 2, type: 'edited', person: {name: 'Chelsea Hagon'}, date: '6d ago', dateTime: '2023-01-23T11:03'},
-                {id: 3, type: 'sent', person: {name: 'Chelsea Hagon'}, date: '6d ago', dateTime: '2023-01-23T11:24'},
-                {
-                    id: 4,
-                    type: 'commented',
-                    person: {
-                        name: 'Chelsea Hagon',
-                        imageUrl:
-                            'https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80',
-                    },
-                    comment: 'Called client, they reassured me the invoice would be paid by the 25th.',
-                    date: '3d ago',
-                    dateTime: '2023-01-23T15:56',
-                },
-                {id: 5, type: 'viewed', person: {name: 'Alex Curren'}, date: '2d ago', dateTime: '2023-01-24T09:12'},
-                {id: 6, type: 'paid', person: {name: 'Alex Curren'}, date: '1d ago', dateTime: '2023-01-24T09:20'},
-            ]
-
         }
     },
     methods: {
+        updateOrder() {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.patch(route("updateOrder", {
+                    'id': this.order_id,
+                    'description': this.data.order.description,
+                })).then(r => {
+                });
+            });
+        },
         getOrder() {
             axios.get('/sanctum/csrf-cookie').then(() => {
                 axios.get(route("getOrderById", {'id': this.order_id})).then(r => {
@@ -45,7 +36,7 @@ export default {
         }
     },
     components: {
-        PaperClipIcon, CheckCircleIcon
+        PaperClipIcon, CheckCircleIcon, InputText, Button, Textarea
     }
 }
 </script>
@@ -104,7 +95,7 @@ export default {
                         Описание заказчика
                     </dt>
                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                        {{ data.order.description }}
+                       <Textarea class="w-full min-h-40" v-model="data.order.description"></Textarea>
                     </dd>
                 </div>
                 <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -155,11 +146,15 @@ export default {
             </dl>
         </div>
 
+        <div class="mb-8">
+            <Button @click="updateOrder()" label="Редактировать заказ"/>
+        </div>
+
         <div v-if="data != null">
             <p class="font-bold text-lg mb-4">
                 Сообщения между пользователями
             </p>
-            <ul role="list" class="space-y-6" >
+            <ul role="list" class="space-y-6">
 
                 <li v-for="item in data.messages" class="relative flex gap-x-4">
                     <div
