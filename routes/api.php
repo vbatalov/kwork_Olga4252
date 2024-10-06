@@ -30,6 +30,7 @@ Route::prefix("admin")->group(function () {
         Route::get("order", "getOrder")->name("getOrderById");
         Route::get("categories", "getCategories")->name("getCategories");
         Route::get("category", "getCategory")->name("get-category");
+        Route::get("specialists", "getSpecialists")->name("getSpecialists");
 
         Route::put("category", "updateOrCreateCategory")->name("save-category");
         Route::put("createSubject", "createSubject")->name("createSubject");

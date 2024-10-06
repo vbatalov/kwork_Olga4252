@@ -136,6 +136,7 @@ import {
 const navigation = [
     { name: 'Дашборд', href: '/', icon: HomeIcon, current: false },
     { name: 'Пользователи', href: '/users', icon: UsersIcon, current: false },
+    { name: 'Специалисты', href: '/specialists', icon: UsersIcon, current: false },
     { name: 'Заказы', href: '/orders', icon: FolderIcon, current: false },
     { name: 'Категории', href: '/categories', icon: CogIcon, current: false },
     // { name: 'Финансы', href: '#', icon: CurrencyDollarIcon, current: false },

@@ -13,6 +13,8 @@ use App\Models\Category;
 use App\Models\Log;
 use App\Models\Message;
 use App\Models\Order;
+use App\Models\Specialist;
+use App\Models\SpecialistCategory;
 use App\Models\Subject;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -45,6 +47,7 @@ class AdminApiController extends Controller
 
         return UserResource::collection(User::paginate(10));
     }
+
     public function getUserLogs(Request $request)
     {
         return Log::whereUserId($request->get("user_id"))->get();
@@ -148,7 +151,37 @@ class AdminApiController extends Controller
         return response()->json([
             "status" => "deleted"
         ], 200);
+    }
 
+    public function getSpecialists()
+    {
+        return Specialist::paginate("10");
+    }
+
+    public function updateSpecialistCategories(Request $request)
+    {
+        SpecialistCategory::create([
+            "specialist_id" => $request->get("specialist_id"),
+        ])->delete();
+
+        foreach ($request->get("categories_id") as $category_id) {
+            SpecialistCategory::create([
+                "specialist_id" => $request->get("specialist_id"),
+                "category_id" => $category_id
+            ]);
+        }
+
+        return response()->json(null, 201);
+    }
+
+
+    public function getSpecialistCategories(Request $request)
+    {
+        return SpecialistCategory::where(
+            [
+                "specialist_id" => $request->get("specialist_id")
+            ]
+        )->get();
     }
 
 }

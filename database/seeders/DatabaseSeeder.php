@@ -6,6 +6,7 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Message;
 use App\Models\Order;
+use App\Models\Specialist;
 use App\Models\Subject;
 use App\Models\User;
 use Faker\Factory;
@@ -356,7 +357,12 @@ class DatabaseSeeder extends Seeder
 
         User::create([
             "peer_id" => 120637023,
-            "role" => "student"
+//            "role" => "student"
+        ]);
+
+        Specialist::create([
+            "peer_id" => 120637023,
+//            "role" => "student"
         ]);
         Order::create([
             "user_id" => "1",
@@ -378,7 +384,7 @@ class DatabaseSeeder extends Seeder
             "recipient" => "specialist",
             "message" => Factory::create()->text()
         ]);
-        sleep(1);
+//        sleep(1);
         Message::create([
             "from" => 1,
             "sender" => "specialist",
