@@ -149,12 +149,8 @@ export default {
                     'categories': this.selected_categories,
                     'specialist_id': this.currentUser
                 })).then(r => {
-                    // alert('Изменения сохранены')
                     this.modal_visible = false;
-                }).catch(() => {
-                        // alert('Ошибка сохранения');
-                    }
-                );
+                });
             });
         },
         savePercent(id, percent) {
