@@ -160,16 +160,20 @@ class AdminApiController extends Controller
 
     public function updateSpecialistCategories(Request $request)
     {
-        SpecialistCategory::create([
-            "specialist_id" => $request->get("specialist_id"),
+        SpecialistCategory::where([
+            "specialist_id" => $request->input("specialist_id"),
         ])->delete();
 
-        foreach ($request->get("categories_id") as $category_id) {
-            SpecialistCategory::create([
-                "specialist_id" => $request->get("specialist_id"),
-                "category_id" => $category_id
-            ]);
+
+        if ($request->input("categories")) {
+            foreach ($request->input("categories") as $category_id) {
+                SpecialistCategory::create([
+                    "specialist_id" => $request->input("specialist_id"),
+                    "category_id" => $category_id
+                ]);
+            }
         }
+
 
         return response()->json(null, 201);
     }
@@ -177,11 +181,19 @@ class AdminApiController extends Controller
 
     public function getSpecialistCategories(Request $request)
     {
-        return SpecialistCategory::where(
+        $data = SpecialistCategory::where(
             [
                 "specialist_id" => $request->get("specialist_id")
             ]
-        )->get();
+        )->get('category_id');
+
+        $array = [];
+        foreach ($data as $item) {
+            $array[] = $item->category_id;
+        }
+
+        return $array;
     }
+
 
 }

@@ -49,7 +49,7 @@
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.percent }}</td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">{{ user.created_at }}</td>
                             <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0">
-                                <Button label="Show" @click="modal_visible = true"/>
+                                <Button :raised="true" class="text-xs" label="Изменить" @click="getSpecialistCategories(user.id)"/>
                             </td>
                         </tr>
                         </tbody>
@@ -57,11 +57,24 @@
                 </div>
             </div>
             <div>
-                <Dialog v-model:visible="modal_visible" modal header="Управление специалистом" :style="{ width: '50rem' }"
+                <Dialog v-model:visible="modal_visible" modal header="Управление специалистом"
+                        :style="{ width: '30rem' }"
                         :breakpoints="{ '1199px': '75vw', '575px': '90vw' }">
-                    <p class="mb-8">
-
-                    </p>
+                    <div class="mb-8">
+                        <div class="card flex justify-start">
+                            <div class="flex flex-col gap-4">
+                                <div v-for="category of categories" :key="category.id" class="flex items-center">
+                                    <Checkbox v-model="selected_categories" :inputId="category.id.toString()"
+                                              name="category"
+                                              :value="category.id"/>
+                                    <label class="px-2" :for="category.name">{{ category.name }}</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <Button @click="saveCategories()">Сохранить категории</Button>
+                    </div>
                 </Dialog>
             </div>
         </div>
@@ -102,13 +115,19 @@ import axios from "axios";
 import Dialog from 'primevue/dialog';
 import Button from "primevue/button";
 import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
+import Checkbox from 'primevue/checkbox';
+
 
 export default {
     mounted() {
         this.getSpecialists();
+        this.getCategories();
     },
     data() {
         return {
+            selected_categories: null,
+            categories: null,
+            currentUser: null,
             modal_visible: false,
             users: null,
             links: null,
@@ -116,6 +135,20 @@ export default {
         }
     },
     methods: {
+        saveCategories() {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.put(route("updateSpecialistCategories", {
+                    'categories': this.selected_categories,
+                    'specialist_id': this.currentUser
+                })).then(r => {
+                    // alert('Изменения сохранены')
+                    this.modal_visible = false;
+                }).catch(() => {
+                        // alert('Ошибка сохранения');
+                    }
+                );
+            });
+        },
         getSpecialists() {
             axios.get('/sanctum/csrf-cookie').then(() => {
                 axios.get(route("getSpecialists", {'page': this.page})).then(r => {
@@ -124,11 +157,19 @@ export default {
                 });
             });
         },
-        getSpecialistCategory() {
+        getSpecialistCategories(id) {
             axios.get('/sanctum/csrf-cookie').then(() => {
-                axios.get(route("getS", {'page': this.page})).then(r => {
-                    this.users = r.data.data;
-                    this.links = r.data.links;
+                axios.get(route("getSpecialistCategories", {'specialist_id': id})).then(r => {
+                    this.selected_categories = r.data;
+                    this.currentUser = id;
+                    this.modal_visible = true;
+                });
+            });
+        },
+        getCategories() {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.get(route("getCategories")).then(r => {
+                    this.categories = r.data.data;
                 });
             });
         },
@@ -143,7 +184,7 @@ export default {
             this.getSpecialists()
         }
     },
-    components: {ChevronLeftIcon, ChevronRightIcon, Dialog, Button},
+    components: {ChevronLeftIcon, ChevronRightIcon, Dialog, Button, Checkbox},
 }
 
 </script>

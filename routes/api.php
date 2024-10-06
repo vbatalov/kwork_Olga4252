@@ -31,7 +31,9 @@ Route::prefix("admin")->group(function () {
         Route::get("categories", "getCategories")->name("getCategories");
         Route::get("category", "getCategory")->name("get-category");
         Route::get("specialists", "getSpecialists")->name("getSpecialists");
+        Route::get("specialist-categories", "getSpecialistCategories")->name("getSpecialistCategories");
 
+        Route::put("specialist-categories", "updateSpecialistCategories")->name("updateSpecialistCategories");
         Route::put("category", "updateOrCreateCategory")->name("save-category");
         Route::put("createSubject", "createSubject")->name("createSubject");
         Route::put("updateSubject", "updateSubject")->name("updateSubject");
