@@ -37,7 +37,7 @@
                                             <ul role="list" class="-mx-2 space-y-1">
                                                 <li v-for="item in navigation" :key="item.name">
                                                     <router-link :to="item.href"
-                                                       :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
+                                                                 :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
                                                         <component :is="item.icon"
                                                                    :class="[item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white', 'h-6 w-6 shrink-0']"
                                                                    aria-hidden="true"/>
@@ -70,7 +70,7 @@
                                 <li v-for="item in navigation" :key="item.name">
                                     <router-link :to="item.href"
                                                  active-class="text-white bg-indigo-700/50"
-                                       :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
+                                                 :class="[item.current ? 'bg-indigo-700 text-white' : 'text-indigo-200 hover:bg-indigo-700 hover:text-white', 'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6']">
                                         <component :is="item.icon"
                                                    :class="[item.current ? 'text-white' : 'text-indigo-200 group-hover:text-white', 'h-6 w-6 shrink-0']"
                                                    aria-hidden="true"/>
@@ -120,25 +120,16 @@
 <script setup>
 import axios from "axios";
 
-import { ref } from 'vue'
-import { Dialog, DialogPanel, TransitionChild, TransitionRoot } from '@headlessui/vue'
-import {
-    Bars3Icon,
-    ChartPieIcon,
-    CurrencyDollarIcon,
-    FolderIcon,
-    HomeIcon,
-    UsersIcon,
-    XMarkIcon,
-    CogIcon,
-} from '@heroicons/vue/24/outline'
+import {ref} from 'vue'
+import {Dialog, DialogPanel, TransitionChild, TransitionRoot} from '@headlessui/vue'
+import {Bars3Icon, CogIcon, FolderIcon, HomeIcon, UsersIcon, XMarkIcon,} from '@heroicons/vue/24/outline'
 
 const navigation = [
-    { name: 'Дашборд', href: '/', icon: HomeIcon, current: false },
-    { name: 'Пользователи', href: '/users', icon: UsersIcon, current: false },
-    { name: 'Специалисты', href: '/specialists', icon: UsersIcon, current: false },
-    { name: 'Заказы', href: '/orders', icon: FolderIcon, current: false },
-    { name: 'Категории', href: '/categories', icon: CogIcon, current: false },
+    {name: 'Дашборд', href: '/', icon: HomeIcon, current: false},
+    {name: 'Пользователи', href: '/users', icon: UsersIcon, current: false},
+    {name: 'Специалисты', href: '/specialists', icon: UsersIcon, current: false},
+    {name: 'Заказы', href: '/orders', icon: FolderIcon, current: false},
+    {name: 'Категории', href: '/categories', icon: CogIcon, current: false},
     // { name: 'Финансы', href: '#', icon: CurrencyDollarIcon, current: false },
     // { name: 'Reports', href: '#', icon: ChartPieIcon, current: false },
 ]

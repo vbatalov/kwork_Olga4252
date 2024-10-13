@@ -115,6 +115,10 @@
         </div>
     </div>
 
+    <div>
+        <Toast position="bottom-right"/>
+    </div>
+
 </template>
 <script>
 import axios from "axios";
@@ -124,6 +128,9 @@ import {ChevronLeftIcon, ChevronRightIcon} from '@heroicons/vue/20/solid'
 import Checkbox from 'primevue/checkbox';
 import InputText from 'primevue/inputtext';
 import 'primeicons/primeicons.css'
+
+import Toast from 'primevue/toast';
+import ToastService from 'primevue/toastservice';
 
 
 export default {
@@ -143,6 +150,14 @@ export default {
         }
     },
     methods: {
+        sendToast(detail = null) {
+            this.$toast.add({
+                severity: 'success',
+                summary: 'Успешно',
+                detail: detail,
+                life: 3000
+            })
+        },
         saveCategories() {
             axios.get('/sanctum/csrf-cookie').then(() => {
                 axios.put(route("updateSpecialistCategories", {
@@ -150,6 +165,8 @@ export default {
                     'specialist_id': this.currentUser
                 })).then(r => {
                     this.modal_visible = false;
+                    this.sendToast('')
+
                 });
             });
         },
@@ -158,7 +175,9 @@ export default {
                 axios.patch(route("updateSpecialistPercent", {
                     'id': id,
                     'percent': percent,
-                }));
+                })).then(() => {
+                    this.sendToast('')
+                });
             });
         },
         getSpecialists() {
@@ -196,7 +215,10 @@ export default {
             this.getSpecialists()
         }
     },
-    components: {ChevronLeftIcon, ChevronRightIcon, Dialog, Button, Checkbox, InputText},
+    components: {
+        ChevronLeftIcon, ChevronRightIcon, Dialog, Button, Checkbox, InputText,
+        Toast, ToastService
+    },
 }
 
 </script>

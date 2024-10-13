@@ -10,7 +10,8 @@ class Attachment extends Model
         "user_id",
         "order_id",
         "attachments",
-        "type"
+        "type",
+        "message",
     ];
 
     protected $casts = [
@@ -18,7 +19,7 @@ class Attachment extends Model
     ];
 
     /** Добавить вложения к ID заказу */
-    public function addAttachmentToOrderId(User $user, $order_id, $attachments): void
+    public function addAttachmentToOrderId(User $user, $order_id, $attachments, $text = ''): void
     {
         foreach ($attachments as $type => $attachment) {
             foreach ($attachment as $item) {
@@ -27,6 +28,7 @@ class Attachment extends Model
                     "order_id" => $order_id,
                     "type" => $type,
                     "attachments" => $item,
+                    "message" => $text,
                 ]);
             }
         }

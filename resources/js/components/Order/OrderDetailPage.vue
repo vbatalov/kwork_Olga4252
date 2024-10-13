@@ -6,6 +6,10 @@ import InputText from "primevue/inputtext";
 import Button from "primevue/button";
 import Textarea from "primevue/textarea";
 
+import Toast from 'primevue/toast';
+import ToastService from 'primevue/toastservice';
+import {useToast} from "primevue/usetoast";
+
 export default {
     created() {
         this.order_id = this.$route.params.id;
@@ -15,15 +19,26 @@ export default {
         return {
             order_id: null,
             data: null,
+            toast: useToast(),
         }
     },
     methods: {
+        sendToast(detail = null) {
+            this.toast.add({
+                severity: 'success',
+                summary: 'Успешно',
+                detail: detail,
+                life: 3000
+            })
+        },
         updateOrder() {
             axios.get('/sanctum/csrf-cookie').then(() => {
                 axios.patch(route("updateOrder", {
                     'id': this.order_id,
                     'description': this.data.order.description,
-                })).then(r => {
+                })).then(() => {
+                    this.sendToast('Заказ сохранен')
+
                 });
             });
         },
@@ -36,12 +51,15 @@ export default {
         }
     },
     components: {
-        PaperClipIcon, CheckCircleIcon, InputText, Button, Textarea
+        PaperClipIcon, CheckCircleIcon, InputText, Button, Textarea, Toast, ToastService
     }
 }
 </script>
 
 <template>
+    <div>
+        <Toast position="bottom-right"/>
+    </div>
     <div class="p-4 sm:px-6 lg:px-8 bg-white">
         <div class="sm:flex sm:items-center">
             <div class="sm:flex-auto">
@@ -95,7 +113,7 @@ export default {
                         Описание заказчика
                     </dt>
                     <dd class="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                       <Textarea class="w-full min-h-40" v-model="data.order.description"></Textarea>
+                        <Textarea class="w-full min-h-40" v-model="data.order.description"></Textarea>
                     </dd>
                 </div>
                 <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -123,25 +141,34 @@ export default {
                     </dd>
                 </div>
 
-                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                    <dt class="text-sm font-medium leading-6 text-gray-900">Вложения</dt>
-                    <dd class="mt-2 text-sm text-gray-900 sm:col-span-2 sm:mt-0">
+
+                <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0 ">
+                    <div class="mt-2 text-sm text-gray-900 sm:col-span-3 sm:mt-0"
+                         v-for="attachment in data.attachments">
                         <ul role="list" class="divide-y divide-gray-100 rounded-md border border-gray-200">
                             <li class="flex items-center justify-between py-4 pl-4 pr-5 text-sm leading-6">
                                 <div class="flex w-0 flex-1 items-center">
                                     <PaperClipIcon class="h-5 w-5 flex-shrink-0 text-gray-400" aria-hidden="true"/>
                                     <div class="ml-4 flex min-w-0 flex-1 gap-2">
-                                        <span class="truncate font-medium">resume_back_end_developer.pdf</span>
-                                        <span class="flex-shrink-0 text-gray-400">2.4mb</span>
+                                        <span class="truncate font-medium">
+                                           Комментарий: {{ attachment.message ?? 'Нет' }}
+                                        </span>
+
+                                        <span class="flex-shrink-0 text-gray-400">
+                                            {{ attachment.attachments.title }}
+                                            <!--                                            {{ attachment.type }}-->
+                                        </span>
                                     </div>
                                 </div>
                                 <div class="ml-4 flex-shrink-0">
-                                    <a href="#"
-                                       class="font-medium text-indigo-600 hover:text-indigo-500">Download</a>
+                                    <a :href="attachment.attachments.url" target="_blank"
+                                       class="font-medium text-indigo-600 hover:text-indigo-500">
+                                        Открыть
+                                    </a>
                                 </div>
                             </li>
                         </ul>
-                    </dd>
+                    </div>
                 </div>
             </dl>
         </div>

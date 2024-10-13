@@ -121,8 +121,20 @@ class Buttons extends Controller
         if (isset($nav_buttons)) {
             $chunk [] = $nav_buttons;
         }
-        $chunk [] = [$this->mainMenuButton()];
+        $chunk [] =
+            [
+                $this->goBack('new_order'),
+                $this->mainMenuButton(),
+            ];
         return $chunk;
+    }
+
+    public function goBack($action, $text = "Назад", $data = [])
+    {
+        return $this->vk->bot->buttonCallback("$text", 'white', [
+            'action' => "$action",
+            'data' => $data
+        ]);
     }
 
     /** Меню выбора: с чем нужно помочь */
@@ -147,7 +159,11 @@ class Buttons extends Controller
 
 
         $chunk = array_chunk($buttons, 2);
-        $chunk [] = [$this->mainMenuButton()];
+        $chunk [] =
+            [
+//                $this->goBack('newOrderSaveCategoryAndShowSubject'),
+                $this->mainMenuButton()
+            ];
         return $chunk;
     }
 
@@ -186,16 +202,9 @@ class Buttons extends Controller
         }
 
         $chunk = array_chunk($buttons, 2);
-        $chunk [] = [$this->goBack("click_from_subject")];
+//        $chunk [] = [$this->goBack("click_from_subject")];
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;
-    }
-
-    public function goBack($action, $text = "Назад")
-    {
-        return $this->vk->bot->buttonCallback("$text", 'white', [
-            'action' => "$action"
-        ]);
     }
 
     /** Опубликовать заявку */
