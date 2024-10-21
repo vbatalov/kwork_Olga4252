@@ -31,6 +31,8 @@ Route::prefix("admin")->group(function () {
         Route::get("order", "getOrder")->name("getOrderById");
         Route::patch("order", "updateOrder")->name("updateOrder");
 
+        Route::get("subjects", "getSubjects")->name("getSubjects");
+
         Route::get("categories", "getCategories")->name("getCategories");
         Route::get("category", "getCategory")->name("get-category");
         Route::put("category", "updateOrCreateCategory")->name("save-category");

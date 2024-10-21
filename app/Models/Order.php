@@ -23,9 +23,23 @@ class Order extends Model
         "deadline" => "string"
     ];
 
-    public function getAvailableOrders($offset = 0)
+    public function attachments()
     {
-        return Order::where("status", "pending")->offset($offset)->limit(5)->get();
+        return $this->hasMany(Attachment::class, 'order_id', 'id');
+    }
+    public static function setStatus($order_id, $status): void
+    {
+        Order::findOrFail($order_id)->update([
+            "status" => "$status"
+        ]);
+    }
+
+    public function getAvailableOrders($offset = 0, array $categories = [])
+    {
+        return Order::limit(5)->offset($offset)
+            ->get()
+            ->whereIn('category_id', $categories)
+            ->where('status', 'pending');
     }
 
     /** Создание заказа при клике "Новый заказ"
@@ -112,13 +126,6 @@ class Order extends Model
         ]);
 
         return $order->id;
-    }
-
-    public static function setStatus($order_id, $status): void
-    {
-        Order::findOrFail($order_id)->update([
-            "status" => "$status"
-        ]);
     }
 
     public function category(): HasOne // Получить категорию

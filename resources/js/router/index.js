@@ -12,6 +12,7 @@ import CategoriesPage from "../components/Category/CategoriesPage.vue";
 import CategorySettingsPage from '../components/Category/CategorySettingsPage.vue'
 
 import SpecialistsPage from "../components/Specialist/SpecialistsPage.vue";
+import SpecialistsDetailsPage from "../components/Specialist/SpecialistsDetailsPage.vue";
 
 import NotFoundPage from "../components/NotFoundPage.vue";
 import {createRouter, createWebHistory} from "vue-router";
@@ -42,6 +43,10 @@ const routes = [
     {
         path: '/specialists',
         component: SpecialistsPage,
+    },
+    {
+        path: '/specialists/:id',
+        component: SpecialistsDetailsPage,
     },
 
     {

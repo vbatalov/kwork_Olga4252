@@ -89,7 +89,11 @@ class OrderSpecialistController extends Controller
 
     private function orders_available($offset = 0)
     {
-        $orders = $this->order->getAvailableOrders(offset: $offset);
+        $availableCategoriesSpecialist = [];
+        foreach ($this->specialist->categories as $category) {
+            $availableCategoriesSpecialist[] = $category->category_id;
+        }
+        $orders = $this->order->getAvailableOrders(offset: $offset, categories: $availableCategoriesSpecialist);
 
         // Устанавливаю куки пользователю, пока он выбирает заказ и от него не требуется ввода сообщений
         $this->specialist->update([
@@ -112,6 +116,16 @@ class OrderSpecialistController extends Controller
 
         $this->bot->eventAnswerSnackbar("Просмотр заказа");
         $this->bot->msg($text)->kbd($this->button->view_order($order_id, $offset))->send();
+
+        $attachments = $order->attachments;
+        if ($attachments->count()) {
+            $this->bot->reply("Количество вложений в заказе: {$attachments->count()}");
+
+            foreach ($attachments as $attachment) {
+                $url = $attachment->attachments['orig_photo']['url'];
+                $this->bot->msg("$url")->send();
+            }
+        }
     }
 
     // Предложить цену

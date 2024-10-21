@@ -9,7 +9,7 @@ class SpecialistCategory extends Model
 {
     protected $fillable = [
         "specialist_id",
-        "category_id",
+        "subject_id",
     ];
 
     public function specialist(): BelongsTo
@@ -17,8 +17,8 @@ class SpecialistCategory extends Model
         return $this->belongsTo(Specialist::class);
     }
 
-    public function category(): BelongsTo
+    public function subject(): BelongsTo
     {
-        return $this->belongsTo(Category::class);
+        return $this->belongsTo(Subject::class);
     }
 }

@@ -83,6 +83,11 @@ class AdminApiController extends Controller
         return CategoryResource::collection(Category::all());
     }
 
+    public function getSubjects()
+    {
+        return CategoryResource::collection(Category::all());
+    }
+
     public function getCategory(Request $request)
     {
         $category_id = $request->get("category_id");
@@ -163,7 +168,7 @@ class AdminApiController extends Controller
 
     public function getSpecialists()
     {
-        return Specialist::paginate("10");
+        return Specialist::all();
     }
 
     public function updateSpecialistCategories(Request $request)
@@ -177,7 +182,7 @@ class AdminApiController extends Controller
             foreach ($request->input("categories") as $category_id) {
                 SpecialistCategory::create([
                     "specialist_id" => $request->input("specialist_id"),
-                    "category_id" => $category_id
+                    "subject_id" => $category_id
                 ]);
             }
         }
@@ -193,11 +198,11 @@ class AdminApiController extends Controller
             [
                 "specialist_id" => $request->get("specialist_id")
             ]
-        )->get('category_id');
+        )->get('subject_id');
 
         $array = [];
         foreach ($data as $item) {
-            $array[] = $item->category_id;
+            $array[] = $item->subject_id;
         }
 
         return $array;

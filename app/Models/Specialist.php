@@ -6,6 +6,7 @@ use App\Http\Controllers\VK\Buttons;
 use App\Http\Controllers\VK\ButtonsSpecialist;
 use App\Http\Controllers\VK\VKSpecialistController;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Specialist extends Model
 {
@@ -24,6 +25,11 @@ class Specialist extends Model
     public function __construct()
     {
         $this->vk = new VKSpecialistController();
+    }
+
+    public function categories(): HasMany
+    {
+        return $this->hasMany(SpecialistCategory::class, 'specialist_id', 'id');
     }
 
     public function init($user_info): Specialist

@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('specialist_categories', function (Blueprint $table) {
             $table->id();
             $table->foreignId("specialist_id")->constrained("specialists")->cascadeOnDelete();
-            $table->foreignId("category_id")->constrained("categories")->cascadeOnDelete();
+            $table->foreignId("subject_id")->constrained("subjects")->cascadeOnDelete();
             $table->timestamps();
         });
     }

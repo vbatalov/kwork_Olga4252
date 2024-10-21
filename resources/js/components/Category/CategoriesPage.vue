@@ -16,10 +16,6 @@
                         <thead>
                         <tr>
                             <th scope="col"
-                                class="py-3 pl-4 pr-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500 sm:pl-0">
-                                ID
-                            </th>
-                            <th scope="col"
                                 class="px-3 py-3 text-left text-xs font-medium uppercase tracking-wide text-gray-500">
                                 Наименование
                             </th>
@@ -30,9 +26,6 @@
                         </thead>
                         <tbody class="divide-y divide-gray-200 ">
                         <tr v-for="category in categories">
-                            <td class="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-0">
-                                {{ category.id }}
-                            </td>
                             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                                 {{ category.name }}
                             </td>

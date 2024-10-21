@@ -4,14 +4,15 @@ import App from './components/App.vue'
 import router from './router/index.js'
 import PrimeVue from 'primevue/config';
 import ToastService from 'primevue/toastservice';
-import Theme from '@primevue/themes/nora';
+import Nora from '@primevue/themes/nora';
+import Aura from '@primevue/themes/aura';
 
 
 const app = createApp(App);
 
 app.use(PrimeVue, {
     theme: {
-        preset: Theme
+        preset: Aura
     }
 })
     .use(ToastService)

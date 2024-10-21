@@ -2,9 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
-use Illuminate\Support\Facades\Http;
 use Tests\TestCase;
 
 class Order extends TestCase
@@ -18,5 +15,22 @@ class Order extends TestCase
         $orders = $order->getAvailableOrders();
         dd($orders);
 
+    }
+
+    public function test_specialistCategories()
+    {
+        $r = \App\Models\Order::get()
+            ->whereIn('category_id', [2])
+            ->where("status", "pending");
+
+        dd($r);
+    }
+
+    public function test_specialistCategoryUri()
+    {
+        $o = \App\Models\Order::findOrFail(4);
+        $att = $o->attachments;
+
+        dd($att);
     }
 }

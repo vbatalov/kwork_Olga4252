@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
-use App\Models\Specialist;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
 class ButtonsSpecialist extends Controller
@@ -28,14 +26,14 @@ class ButtonsSpecialist extends Controller
             ],
             [
                 "text" => "Заказы в работе",
-                "color" => "blue",
+                "color" => "green",
                 "action" => "my_orders",
 
             ],
             [
-                "text" => "Баланс",
-                "color" => "blue",
-                "action" => "balance",
+                "text" => "Личный кабинет",
+                "color" => "white",
+                "action" => "account",
 
             ],
         ];
@@ -43,15 +41,15 @@ class ButtonsSpecialist extends Controller
         /** Массив кнопок главного меню */
         $buttons = [];
         foreach ($items as $item) {
-            $buttons [] = [
+            $buttons [] =
                 $this->vk->bot->buttonCallback($item['text'], $item['color'], [
                     "action" => $item['action'],
                     "data" => $item['data'] ?? null,
-                ])
-            ];
+                ]);
+
         }
 
-        return $buttons;
+        return array_chunk($buttons, 2);
     }
 
     /** Список доступных заказов */
