@@ -55,7 +55,6 @@ Route::controller(VKStudentController::class)->group(function () {
 
 Route::controller(VKSpecialistController::class)->group(function () {
     Route::post("vk_bot_specialist", "controller");
-    Route::post("orders_available", "orders_available")->name("orders_available");
     Route::get("diagnostics", "diagnostics");
 });
 
