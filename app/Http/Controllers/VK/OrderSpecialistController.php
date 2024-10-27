@@ -62,7 +62,7 @@ class OrderSpecialistController extends Controller
     {
         // Нажата кнопка Новый заказ
         if ($this->action == "orders_available") {
-            $this->orders_available(offset: $this->data);
+            $this->orders_available(page: $this->data);
         }
 
         if ($this->action == "view_order") {
@@ -87,13 +87,13 @@ class OrderSpecialistController extends Controller
     }
 
 
-    private function orders_available($offset = 0)
+    private function orders_available($page = 1)
     {
         $availableCategoriesSpecialist = [];
         foreach ($this->specialist->categories as $category) {
-            $availableCategoriesSpecialist[] = $category->category_id;
+            $availableCategoriesSpecialist[] = $category->subject_id;
         }
-        $orders = $this->order->getAvailableOrders(offset: $offset, categories: $availableCategoriesSpecialist);
+        $orders = $this->order->getAvailableOrders(page: $page, categories: $availableCategoriesSpecialist);
 
         // Устанавливаю куки пользователю, пока он выбирает заказ и от него не требуется ввода сообщений
         $this->specialist->update([
@@ -104,7 +104,7 @@ class OrderSpecialistController extends Controller
         $this->bot->eventAnswerSnackbar("$message");
 
         $text = view("messages_specialist.orders_available", compact("orders"));
-        $this->bot->msg("$text")->kbd($this->button->orders_available($orders, $offset))->send();
+        $this->bot->msg("$text")->kbd($this->button->orders_available($orders, $page))->send();
     }
 
     // Просмотр заказа

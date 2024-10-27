@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Pagination\LengthAwarePaginator;
+use LaravelIdea\Helper\App\Models\_IH_Order_C;
 
 class Order extends Model
 {
@@ -23,10 +25,6 @@ class Order extends Model
         "deadline" => "string"
     ];
 
-    public function attachments()
-    {
-        return $this->hasMany(Attachment::class, 'order_id', 'id');
-    }
     public static function setStatus($order_id, $status): void
     {
         Order::findOrFail($order_id)->update([
@@ -34,12 +32,20 @@ class Order extends Model
         ]);
     }
 
-    public function getAvailableOrders($offset = 0, array $categories = [])
+    public function attachments()
     {
-        return Order::limit(5)->offset($offset)
-            ->get()
-            ->whereIn('category_id', $categories)
-            ->where('status', 'pending');
+        return $this->hasMany(Attachment::class, 'order_id', 'id');
+    }
+
+    public function getAvailableOrders($page = 1, array $categories = []): array|_IH_Order_C|LengthAwarePaginator
+    {
+        return Order::whereIn('category_id', $categories)
+            ->where('status', 'pending')->paginate(perPage: 4, page: $page);
+
+//        return Order::limit(5)->offset($offset)
+//            ->get()
+//            ->whereIn('category_id', $categories)
+//            ->where('status', 'pending');
     }
 
     /** Создание заказа при клике "Новый заказ"

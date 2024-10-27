@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class ButtonsSpecialist extends Controller
 {
@@ -22,7 +22,7 @@ class ButtonsSpecialist extends Controller
                 "text" => "Доступные заказы",
                 "color" => "green",
                 "action" => "orders_available",
-                "data" => 0
+                "data" => 1
             ],
             [
                 "text" => "Заказы в работе",
@@ -53,7 +53,7 @@ class ButtonsSpecialist extends Controller
     }
 
     /** Список доступных заказов */
-    public function orders_available(Collection $orders, $offset)
+    public function orders_available(LengthAwarePaginator $orders, $page)
     {
         $buttons = [];
         foreach ($orders as $order) {
@@ -62,32 +62,33 @@ class ButtonsSpecialist extends Controller
                 color: 'green', payload: [
                     "action" => "view_order",
                     'data' => $order->id,
-                    'offset' => $offset
+                    'offset' => $page
                 ]);
 
         }
 
         $chunk = array_chunk($buttons, 2);
 
-        $next_page = $this->vk->bot->buttonCallback(text: "Следующая страница",
-            color: 'blue', payload: [
-                "action" => "orders_available",
-                'data' => $offset + 5
-            ]);
-
-
-        if ($offset >= 5) {
-            $prev_page = $this->vk->bot->buttonCallback(text: "Предыдущая страница",
+        $next_page = [];
+        $prev_page = [];
+        if ($orders->hasMorePages()) {
+            $next_page[] = $this->vk->bot->buttonCallback(text: ">",
                 color: 'blue', payload: [
                     "action" => "orders_available",
-                    'data' => $offset - 5
+                    'data' => $page + 1
                 ]);
-
-            $chunk [] = [$prev_page, $next_page];
-        } else {
-            $chunk [] = [$next_page];
         }
 
+
+        if (!$orders->onFirstPage()) {
+            $prev_page[] = $this->vk->bot->buttonCallback(text: "<",
+                color: 'blue', payload: [
+                    "action" => "orders_available",
+                    'data' => $page - 1
+                ]);
+        }
+
+        $chunk [] = array_merge($prev_page, $next_page);
 
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;

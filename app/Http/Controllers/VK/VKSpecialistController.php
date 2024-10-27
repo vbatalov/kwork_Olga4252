@@ -69,10 +69,4 @@ class VKSpecialistController extends Controller
 
         return true;
     }
-
-    public function orders_available()
-    {
-        $order = new Order();
-        return $order->getAvailableOrders();
-    }
 }
