@@ -10,7 +10,7 @@
         </div>
 
         <div class="my-4">
-            <div>
+            <div class="mb-2">
                 Предметы специалиста
             </div>
             <MultiSelect v-model="selected_subjects" :options="subjects"
@@ -23,6 +23,10 @@
                     </div>
                 </template>
             </MultiSelect>
+
+            <div>
+                <Button class="my-2 w-full" label="Сохранить категории" @click="saveCategories"/>
+            </div>
         </div>
     </div>
 
@@ -67,6 +71,16 @@ export default {
                 detail: detail,
                 life: 3000
             })
+        },
+        saveCategories() {
+            axios.get('/sanctum/csrf-cookie').then(() => {
+                axios.patch(route("updateSpecialistCategories"), {
+                    'categories': this.selected_subjects,
+                    'specialist_id': this.currentUser,
+                }).then(() => {
+                    this.sendToast('Предметы сохранены')
+                });
+            });
         },
         getSubjects() {
             axios.get('/sanctum/csrf-cookie').then(() => {
