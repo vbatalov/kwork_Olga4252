@@ -122,8 +122,9 @@ class OrderSpecialistController extends Controller
             $this->bot->reply("Количество вложений в заказе: {$attachments->count()}");
 
             foreach ($attachments as $attachment) {
-                $url = $attachment->attachments['orig_photo']['url'];
-                $this->bot->msg("$url")->send();
+                $url = $attachment->attachments['url'];
+
+                $this->bot->reply("$attachment->message\n" . asset("storage/$url"));
             }
         }
     }
