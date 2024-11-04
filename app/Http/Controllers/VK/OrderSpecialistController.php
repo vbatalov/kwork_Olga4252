@@ -135,7 +135,11 @@ class OrderSpecialistController extends Controller
         $this->bot->eventAnswerSnackbar("Просмотр заказа");
         $this->bot->msg($text)->kbd($this->button->view_order($order_id, $offset))->send();
 
-        $attachments = $order->attachments->where(['from' => 'student']);
+        $attachments = Attachment::where([
+            'order_id' => $order_id,
+            'from' => 'student'
+        ])->get();
+
         if ($attachments->count()) {
             $this->bot->reply("Количество вложений в заказе: {$attachments->count()}");
 
@@ -144,6 +148,8 @@ class OrderSpecialistController extends Controller
 
                 $this->bot->reply("$attachment->message\n" . asset("storage/$url"));
             }
+        } else {
+            $this->bot->reply("Вложений в заказе нет");
         }
     }
 
