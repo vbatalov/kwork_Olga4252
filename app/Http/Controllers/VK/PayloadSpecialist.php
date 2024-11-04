@@ -51,7 +51,10 @@ class PayloadSpecialist extends Controller
 
                 /** Возврат в главное меню */
                 if ($action == "return_to_home") {
-                    $message = view("messages_specialist.start");
+                    $message = view("messages_specialist.start",
+                    [
+                        "specialist" => $this->specialist
+                    ]);
                     $this->specialist->update([
                         "cookie" => null
                     ]);

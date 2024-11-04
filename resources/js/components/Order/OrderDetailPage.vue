@@ -161,7 +161,7 @@ export default {
                                     </div>
                                 </div>
                                 <div class="ml-4 flex-shrink-0">
-                                    <a :href="attachment.attachments.url" target="_blank"
+                                    <a :href="'/storage/' + attachment.attachments.url" target="_blank"
                                        class="font-medium text-indigo-600 hover:text-indigo-500">
                                         Открыть
                                     </a>

@@ -31,12 +31,12 @@ class ButtonsSpecialist extends Controller
                 "action" => "my_orders",
 
             ],
-            [
-                "text" => "Личный кабинет",
-                "color" => "white",
-                "action" => "account",
-
-            ],
+//            [
+//                "text" => "Личный кабинет",
+//                "color" => "white",
+//                "action" => "account",
+//
+//            ],
         ];
 
         /** Массив кнопок главного меню */
