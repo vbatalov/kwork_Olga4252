@@ -191,7 +191,7 @@ class MessagesSpecialist extends Controller
 
     private function submitWork($order_id, $attachments = [], $text = "")
     {
-        if (count($attachments)) {
+        if (is_array($attachments) && count($attachments)) {
             $attachModel = new Attachment();
             $attachModel->saveLocalAttachment("specialist", $order_id, $attachments, "$text");
             $text = 'Прикрепили вложение к заказу. При необходимости добавьте ещё вложения или подтвердите выполнение заказа';
