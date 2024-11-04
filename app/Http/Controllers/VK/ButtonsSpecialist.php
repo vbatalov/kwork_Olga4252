@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\VK;
 
 use App\Http\Controllers\Controller;
+use App\Models\Order;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class ButtonsSpecialist extends Controller
@@ -19,7 +20,7 @@ class ButtonsSpecialist extends Controller
     {
         $items = [
             [
-                "text" => "Доступные заказы",
+                "text" => "Взять заказ",
                 "color" => "green",
                 "action" => "orders_available",
                 "data" => 1
@@ -104,6 +105,25 @@ class ButtonsSpecialist extends Controller
         ]);
     }
 
+    public function my_orders($orders)
+    {
+        $buttons = [];
+
+        /** @var Order $order */
+        foreach ($orders as $order) {
+            $buttons[] = $this->vk->bot->buttonCallback(text: "Заказ № $order->id",
+                color: 'green', payload: [
+                    "action" => "view_my_order",
+                    'data' => $order->id,
+                ]);
+        }
+
+        $chunk = array_chunk($buttons, 2);
+
+        $chunk [] = [$this->mainMenuButton()];
+        return $chunk;
+    }
+
     public function view_order($order_id, $offset)
     {
         $buttons = [];
@@ -129,6 +149,49 @@ class ButtonsSpecialist extends Controller
 
         $chunk [] = [$this->mainMenuButton()];
         return $chunk;
+    }
+
+    public function view_my_order($order_id)
+    {
+        $order = Order::findOrFail($order_id);
+
+        $buttons[] = $this->vk->bot->buttonCallback(text: "Сдать работу",
+            color: 'green', payload: [
+                "action" => "submit_work",
+                'data' => $order_id,
+            ]);
+
+        $buttons[] = $this->vk->bot->buttonCallback(text: "Начать чат",
+            color: 'green', payload: [
+                "action" => "chat_with",
+                "data" => $order_id,
+                "chat_with" => $order->user_id
+            ]);
+
+        $buttons[] = $this->vk->bot->buttonCallback(text: "Назад",
+            color: 'blue', payload: [
+                "action" => "my_orders",
+            ]);
+
+        $buttons = array_chunk($buttons, 2);
+
+        $buttons[] = [$this->mainMenuButton()];
+
+        return $buttons;
+    }
+
+    public function submit_work()
+    {
+        $buttons[] = $this->vk->bot->buttonCallback(text: "Назад",
+            color: 'blue', payload: [
+                "action" => "my_orders",
+            ]);
+
+        $buttons = array_chunk($buttons, 2);
+
+        $buttons[] = [$this->mainMenuButton()];
+
+        return $buttons;
     }
 
     public function send_response_price($offset)
@@ -180,20 +243,24 @@ class ButtonsSpecialist extends Controller
 
     public function start_chat_with($user_id, $order_id, $buttonAlert = false)
     {
+        $order = Order::findOrFail($order_id);
+
+        $changeResponseButton = $this->change_response($order_id);
         if (!$buttonAlert) {
-            return [[$this->change_response($order_id)], [$this->cancel_response($order_id)]];
+            if ($order->status == 'pending') {
+                return
+                    [
+                        [$changeResponseButton],
+                    ];
+            }
         }
 
-        return $this->button_start_chat($user_id, $order_id);
-    }
-
-    private function change_response($order_id)
-    {
-        return $this->vk->bot->buttonCallback(text: "Изменить предложение",
-            color: 'white', payload: [
-                "action" => "offer_price",
-                "data" => $order_id,
-            ]);
+        $buttons = [];
+        $buttons[] = [$this->button_start_chat($user_id, $order_id)];
+        if ($order->status == 'pending') {
+            $buttons[] = [$changeResponseButton];
+        }
+        return $buttons;
     }
 
     private function cancel_response($order_id)
@@ -212,6 +279,15 @@ class ButtonsSpecialist extends Controller
                 "action" => "chat_with",
                 "data" => $order_id,
                 "chat_with" => $user_id
+            ]);
+    }
+
+    public function confirmSubmitWork($order_id)
+    {
+        return $this->vk->bot->buttonCallback(text: "Подтвердить выполнение заказа",
+            color: 'green', payload: [
+                "action" => "confirm_submit_order",
+                "data" => $order_id,
             ]);
     }
 
@@ -239,5 +315,14 @@ class ButtonsSpecialist extends Controller
         return $this->vk->bot->buttonCallback("$text", 'white', [
             'action' => "$action"
         ]);
+    }
+
+    private function change_response($order_id)
+    {
+        return $this->vk->bot->buttonCallback(text: "Изменить предложение",
+            color: 'white', payload: [
+                "action" => "offer_price",
+                "data" => $order_id,
+            ]);
     }
 }

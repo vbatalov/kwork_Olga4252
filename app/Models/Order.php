@@ -32,6 +32,13 @@ class Order extends Model
         ]);
     }
 
+    public static function setExecutor($order_id, $executor_id): void
+    {
+        Order::findOrFail($order_id)->update([
+            "executor_id" => $executor_id
+        ]);
+    }
+
     public function attachments()
     {
         return $this->hasMany(Attachment::class, 'order_id', 'id');
@@ -149,8 +156,11 @@ class Order extends Model
         return $this->hasOne(User::class, "id", "user_id");
     }
 
-    public function response(): HasOne // Получить отклик
+    public function response($id, $specialist_id): Response
     {
-        return $this->hasOne(Response::class, "order_id", "id");
+        return Response::where([
+            "order_id" => $id,
+            "executor_id" => $specialist_id
+        ])->latest()->first();
     }
 }

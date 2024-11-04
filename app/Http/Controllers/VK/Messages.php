@@ -64,7 +64,7 @@ class Messages extends Controller
                 $order_id = str_replace("add_attachments_student_order=", "", $cookie);
                 // Проверяю, отправил ли пользователь вложение
                 if (!empty($attachments)) {
-                    $this->attachments->saveLocalAttachment($this->user, $order_id, $attachments, $text);
+                    $this->attachments->saveLocalAttachment("student", $order_id, $attachments, $text);
                     return $this->bot->msg("Мы добавили вложение в заказ. При необходимости, можете добавить ещё вложения или отправьте заявку.")->kbd($this->button->publishOrder())->send();
                 } else {
                     $order = Order::findOrFail($order_id);

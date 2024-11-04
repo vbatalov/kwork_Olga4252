@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\VK\SubjectController;
 use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Order;
+use App\Models\Response;
 use App\Models\User;
 
 class Buttons extends Controller
@@ -33,18 +34,18 @@ class Buttons extends Controller
                 "data" => "my_orders",
 
             ],
-            [
-                "text" => "Избранные специалисты",
-                "color" => "blue",
-                "data" => "my_favorites_specialists",
-
-            ],
-            [
-                "text" => "Настроить личный кабинет",
-                "color" => "blue",
-                "data" => "user_profile_setting",
-
-            ],
+//            [
+//                "text" => "Избранные специалисты",
+//                "color" => "blue",
+//                "data" => "my_favorites_specialists",
+//
+//            ],
+//            [
+//                "text" => "Настроить личный кабинет",
+//                "color" => "blue",
+//                "data" => "user_profile_setting",
+//
+//            ],
         ];
 
         /** Массив кнопок главного меню */
@@ -162,8 +163,8 @@ class Buttons extends Controller
         $chunk [] =
             [
 //                $this->goBack('newOrderSaveCategoryAndShowSubject'),
-                $this->mainMenuButton()
-            ];
+            $this->mainMenuButton()
+        ];
         return $chunk;
     }
 
@@ -303,8 +304,14 @@ class Buttons extends Controller
 
     public function start_chat_with($specialist_id, $order_id, $buttonAlert = false)
     {
+        $order = Order::findOrFail($order_id);
+
         if (!$buttonAlert) {
-            return $this->accept_offer($order_id);
+            $response = Response::where(['executor_id' => $specialist_id, 'order_id' => $order_id])->firstOrFail();
+            if ($order->status == 'pending') {
+                return $this->accept_offer($order_id, $response->id);
+            }
+            return [];
         }
 
         return $this->vk->bot->buttonCallback(text: "Начать чат", color: "green", payload: [
@@ -314,11 +321,33 @@ class Buttons extends Controller
         ]);
     }
 
-    private function accept_offer($order_id)
+    public function accept_offer($order_id, $response_id)
     {
         return $this->vk->bot->buttonCallback(text: "Принять предложение", color: "green", payload: [
             "action" => "accept_offer",
             "data" => $order_id,
+            "response_id" => $response_id,
         ]);
+    }
+
+    public function accept_specialist_order($order_id)
+    {
+        return [
+            [
+                $this->vk->bot->buttonCallback(text: "Принять работу", color: "green", payload: [
+                    "action" => "yes_accept_specialist_and_finish_order",
+                    "data" => $order_id,
+                ])
+            ],
+            [
+                $this->vk->bot->buttonCallback(text: "Отклонить работу", color: "red", payload: [
+                    "action" => "no_decline_specialist_submit_work",
+                    "data" => $order_id,
+                ])
+            ],
+            [
+                $this->mainMenuButton()
+            ]
+        ];
     }
 }

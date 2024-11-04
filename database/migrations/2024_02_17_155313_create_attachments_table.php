@@ -13,8 +13,8 @@ return new class extends Migration
     {
         Schema::create('attachments', function (Blueprint $table) {
             $table->id();
-            $table->integer("user_id");
-            $table->integer("order_id");
+            $table->enum("from", ["student", "specialist"])->nullable();
+            $table->foreignId("order_id")->constrained("orders")->nullOnDelete();
             $table->string("type");
             $table->json("attachments");
             $table->timestamps();

@@ -8,7 +8,7 @@ use Storage;
 class Attachment extends Model
 {
     protected $fillable = [
-        "user_id",
+        "from",
         "order_id",
         "attachments",
         "type",
@@ -19,23 +19,8 @@ class Attachment extends Model
         "attachments" => "array"
     ];
 
-    /** Добавить вложения к ID заказу */
-    public function addAttachmentToOrderId(User $user, $order_id, $attachments, $text = ''): void
-    {
-        foreach ($attachments as $type => $attachment) {
-            foreach ($attachment as $item) {
-                Attachment::create([
-                    "user_id" => $user->id,
-                    "order_id" => $order_id,
-                    "type" => $type,
-                    "attachments" => $item,
-                    "message" => $text,
-                ]);
-            }
-        }
-    }
-
-    public function saveLocalAttachment(User $user, $order_id, $attachments, $text = ''): void
+    // var $from = Enum [student, specialist]
+    public function saveLocalAttachment(string $from, $order_id, $attachments, $text = ''): void
     {
 
         foreach ($attachments as $type => $attachment) {
@@ -53,7 +38,7 @@ class Attachment extends Model
                 Storage::disk('public')->put("$patch", $content);
 
                 Attachment::create([
-                    "user_id" => $user->id,
+                    "from" => $from,
                     "order_id" => $order_id,
                     "type" => $type,
                     "attachments" => ["url" => $patch],

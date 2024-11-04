@@ -13,6 +13,9 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
+            $table->foreignId("order_id")->constrained("orders")->nullOnDelete();
+            $table->foreignId("executor_id")->constrained("specialists")->nullOnDelete();
+            $table->text("status")->default('success');
             $table->timestamps();
         });
     }

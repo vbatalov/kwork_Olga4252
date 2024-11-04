@@ -17,7 +17,8 @@ return new class extends Migration
             $table->string("name")->nullable();
             $table->string("surname")->nullable();
             $table->string("role")->default("specialist");
-            $table->integer("percent")->default("0");
+            $table->integer("percent")->default("80");
+            $table->double("balance")->default("0");
             $table->string("cookie")->nullable();
             $table->timestamps();
         });

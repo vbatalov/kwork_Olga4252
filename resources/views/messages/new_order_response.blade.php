@@ -6,5 +6,5 @@
 Предмет {{$order->subject->name}}
 Тема {{$order->need_help_with}}
 
-Цена: {{$order->response->price}}
-Комментарий: {{$order->response->note}}
+Цена: {{$order->response($order->id, $specialist->id)->price}}
+Комментарий: {{$order->response($order->id, $specialist->id)->note}}

@@ -19,7 +19,7 @@ return new class extends Migration {
             $table->longText("description")->nullable();
             $table->string("deadline")->nullable();
             $table->enum("status", [
-                "draft", "pending", "wait_payment", "progress", "finish"
+                "draft", "pending", "wait_payment", "progress", 'checking', "finish"
             ])->default("draft");
             $table->integer("executor_id")->nullable();
             $table->string("completion_date")->nullable();

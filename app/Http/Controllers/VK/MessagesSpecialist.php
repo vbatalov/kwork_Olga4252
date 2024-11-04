@@ -54,7 +54,6 @@ class MessagesSpecialist extends Controller
                 return $this->confirm_cancel_response($cookie, $text);
             }
 
-
             /** Предложение цены */
             if (stripos("$cookie", "offer_price_id_") !== false) {
                 $this->setPrice($cookie, $text);
@@ -66,8 +65,79 @@ class MessagesSpecialist extends Controller
                 $this->setNote($order_id, $text);
             }
 
+            /** Сдать работу */
+            if (stripos("$cookie", "submit_work_") !== false) {
+                $order_id = str_replace("submit_work_", "", $cookie);
+                $this->submitWork($order_id, $attachments, $text);
+            }
+
         } catch (SimpleVkException $e) {
             Log::error($e->getMessage());
+        }
+
+        return true;
+    }
+
+    private function sendMessageToUser(mixed $cookie, $text)
+    {
+        $str_replace = str_replace(["chat_with_", "order_id_"], "", $cookie);
+        $array = explode("|", $str_replace);
+
+        $user = $array[0];
+        $order_id = $array[1];
+
+        $user = User::findOrFail($user);
+
+        $VKStudentController = new VKStudentController();
+        $from = "specialist";
+
+        $buttonAlert = true;
+        if (stripos($user->cookie, "|order_id_$order_id") !== false) {
+            $buttonAlert = false;
+        }
+
+        $message = view("private_message", compact("text", "from", "order_id", "buttonAlert"))->render();
+
+        $VKStudentController->bot->msg("$message")
+            ->kbd($this->buttonUser->start_chat_with(specialist_id: $this->specialist->id, order_id: $order_id, buttonAlert: $buttonAlert), true)
+            ->send($user->peer_id);
+
+        Message::add(from: $this->specialist->id, sender: "specialist", to: $user->id, recipient: "user", order_id: $order_id, message: $text);
+
+        $this->bot->reply("Сообщение отправлено.");
+        return true;
+
+    }
+
+    private function confirm_cancel_response(mixed $cookie, $text)
+    {
+        $order_id = str_replace("cancel_response_", "", $cookie);
+        $confirm_text = "Удалить отклик $order_id";
+
+        if ($text === $confirm_text) {
+            $response = Response::where([
+                "executor_id" => $this->specialist->id,
+                "order_id" => $order_id,
+            ])->firstOrFail();
+
+            $response->delete(); // удалил отклик
+
+            $order = Order::findOrFail($response->order_id);
+            $user = User::findOrFail($order->user_id);
+
+            $this->bot->reply("Ваш отклик на заказ удален.");
+
+            $studentBot = new VKStudentController();
+            $studentBot->bot->msg("Исполнитель удалил свой отклик на заказ №$order_id")->send($user->peer_id);
+
+            // обнуляю куки
+            $this->specialist->update([
+                "cookie" => null
+            ]);
+
+
+        } else {
+            $this->bot->reply("Ошибка. Для удаления заказа необходимо написать: $confirm_text. С учетом регистра (без знаков).");
         }
 
         return true;
@@ -119,68 +189,20 @@ class MessagesSpecialist extends Controller
         ]);
     }
 
-    private function sendMessageToUser(mixed $cookie, $text)
+    private function submitWork($order_id, $attachments = [], $text = "")
     {
-        $str_replace = str_replace(["chat_with_", "order_id_"], "", $cookie);
-        $array = explode("|", $str_replace);
-
-        $user = $array[0];
-        $order_id = $array[1];
-
-        $user = User::findOrFail($user);
-
-        $VKSpecialistController = new VKStudentController();
-        $from = "specialist";
-
-        $buttonAlert = true;
-        if (stripos($user->cookie, "|order_id_$order_id") !== false) {
-            $buttonAlert = false;
-        }
-        $message = view("private_message", compact("text", "from", "order_id", "buttonAlert"))->render();
-
-        $VKSpecialistController->bot->msg("$message")
-            ->kbd($this->buttonUser->start_chat_with(specialist_id: $this->specialist->id, order_id: $order_id,buttonAlert: $buttonAlert), true)
-            ->send($user->peer_id);
-
-        Message::add(from: $this->specialist->id, sender: "specialist", to: $user->id, recipient: "user", order_id: $order_id, message: $text);
-
-        $this->bot->reply("Сообщение отправлено.");
-        return true;
-
-    }
-
-    private function confirm_cancel_response(mixed $cookie, $text)
-    {
-        $str_replace = str_replace("cancel_response_", "", $cookie);
-        $confirm_text = "Удалить отклик $str_replace";
-
-        if ($text === $confirm_text) {
-            $response = Response::where([
-                "executor_id" => $this->specialist->id,
-                "order_id" => $str_replace,
-            ])->firstOrFail();
-
-            $response->delete(); // удалил отклик
-
-            $order = Order::findOrFail($response->order_id);
-            $user = User::findOrFail($order->user_id);
-
-            $this->bot->reply("Ваш отклик на заказ удален.");
-
-            $studentBot = new VKStudentController();
-            $studentBot->bot->msg("Исполнитель удалил свой отклик на заказ №$str_replace")->send($user->peer_id);
-
-            // обнуляю куки
-            $this->specialist->update([
-                "cookie" => null
-            ]);
-
-
+        if (count($attachments)) {
+            $attachModel = new Attachment();
+            $attachModel->saveLocalAttachment("specialist", $order_id, $attachments, "$text");
+            $text = 'Прикрепили вложение к заказу. При необходимости добавьте ещё вложения или подтвердите выполнение заказа';
+            $this->bot->msg($text)->kbd([
+                [$this->button->confirmSubmitWork($order_id)],
+                [$this->button->mainMenuButton()]
+            ])->send();
         } else {
-            $this->bot->reply("Ошибка. Для удаления заказа необходимо написать: $confirm_text. С учетом регистра (без знаков).");
+            $this->bot->reply("Вы не прикрепили вложение. Сдать заказ текстом нельзя.");
         }
 
-        return true;
     }
 
 

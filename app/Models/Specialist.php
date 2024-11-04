@@ -18,6 +18,7 @@ class Specialist extends Model
         "role",
         "percent",
         "cookie",
+        "balance"
     ];
 
     public VKSpecialistController $vk;
